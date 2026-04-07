@@ -25,14 +25,14 @@ The goal is to support practical platform operations such as:
 
 After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, run the bootstrap script first.
 
-If this repository is public:
+This repository is public, so the normal download command is:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
-If this repository is private, use a GitHub token with read access:
+If you are using a private fork or private mirror instead, use a GitHub token with read access:
 
 ```bash
 read -rsp "GitHub token: " GITHUB_TOKEN; echo
@@ -69,7 +69,7 @@ python3 -m venv ~/.local/share/3plug-pro/venv
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
-If this repository is private, use the same token for the pip install:
+If you are installing from a private fork or private mirror, use the same token for the pip install:
 
 ```bash
 read -rsp "GitHub token: " GITHUB_TOKEN; echo

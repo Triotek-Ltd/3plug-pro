@@ -25,14 +25,14 @@ On a new Ubuntu/Debian server, start as `root` or with a sudo-capable admin user
 
 Download and run the bootstrap script.
 
-If the repository is public:
+The main 3plug-pro repository is public, so the normal download command is:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
-If the repository is private, use a GitHub token with read access:
+If you are using a private fork or private mirror instead, use a GitHub token with read access:
 
 ```bash
 read -rsp "GitHub token: " GITHUB_TOKEN; echo
@@ -91,7 +91,7 @@ python3 -m venv ~/.local/share/3plug-pro/venv
 ~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
 ```
 
-If the repository is private, use the same token for the pip install:
+If you are installing from a private fork or private mirror, use the same token for the pip install:
 
 ```bash
 read -rsp "GitHub token: " GITHUB_TOKEN; echo
@@ -155,7 +155,7 @@ curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
-For private repository access, use the GitHub API download command from the new server path above.
+For private fork or mirror access, use the GitHub API download command from the new server path above.
 
 If you do not want the script to enable `ufw` automatically, run:
 
