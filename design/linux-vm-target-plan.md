@@ -23,7 +23,10 @@ Windows development machine
 The production-like install source is the Git URL:
 
 ```text
-python3 -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+python3 -m venv ~/.local/share/3plug-pro/venv
+~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
 Until the current foundation is committed and pushed, the Git URL will install the last pushed version on GitHub, not the current working tree.
@@ -31,7 +34,7 @@ Until the current foundation is committed and pushed, the Git URL will install t
 For a test branch, use:
 
 ```text
-python3 -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@<branch>#subdirectory=cli"
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@<branch>#subdirectory=cli"
 ```
 
 ## First Commands
@@ -41,13 +44,14 @@ The first Linux target commands should be:
 ```text
 3plug --help
 3plug init
-3plug doctor
 3plug server preflight
 3plug install server-dependencies
 3plug install bench
 ```
 
 At this stage, `install server-dependencies` and `install bench` may still be plan-only until we implement the real Linux handlers.
+
+`3plug doctor` is currently a source workspace check. Use `3plug server preflight` as the first runtime check on a pip-installed Linux target.
 
 ## Local VM Choice
 

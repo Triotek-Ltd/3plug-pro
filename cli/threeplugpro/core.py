@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from importlib import resources
 import json
 from pathlib import Path
 import shutil
@@ -30,7 +31,18 @@ def resolve_root(args: argparse.Namespace) -> Path:
 
 def load_json(root: Path, path: Path) -> Any:
     manifest = path if path.is_absolute() else root / path
-    return json.loads(manifest.read_text(encoding="utf-8"))
+    if manifest.exists():
+        return json.loads(manifest.read_text(encoding="utf-8"))
+
+    fallback = {
+        APP_CATALOG: "app-catalog.json",
+        UPSTREAM_APPS: "upstream-apps.json",
+    }.get(path)
+    if fallback is None:
+        return json.loads(manifest.read_text(encoding="utf-8"))
+
+    data = resources.files("threeplugpro.data").joinpath(fallback).read_text(encoding="utf-8")
+    return json.loads(data)
 
 
 def local_state_dir(root: Path) -> Path:

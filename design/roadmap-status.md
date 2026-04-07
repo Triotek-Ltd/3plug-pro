@@ -76,7 +76,6 @@ Target:
 * WSL Ubuntu 24.04
 * install from `git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli`
 * run `3plug init`
-* run `3plug doctor`
 * run `3plug server preflight`
 * implement and test real Linux `install server-dependencies`, `install bench`, and `bench create`
 
@@ -85,6 +84,7 @@ Important:
 * Git URL install will only include the current foundation after it is committed and pushed.
 * Until then, local editable install is the only way to test the current working tree.
 * `wsl.exe --install Ubuntu-24.04` timed out twice from this terminal, and `wsl.exe -l -v` still reports no installed distributions.
+* `3plug doctor` is currently a source workspace check; use `3plug server preflight` as the first runtime check on a pip-installed server.
 
 ## Current smoke checks
 

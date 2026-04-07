@@ -74,11 +74,12 @@ Next commands:
 
   su - ${THREEPLUG_USER}
   cd ${THREEPLUG_WORKDIR}
-  python3 -m pip install --user "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
-  export PATH="\$HOME/.local/bin:\$PATH"
+  python3 -m venv ~/.local/share/3plug-pro/venv
+  ~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
+  ~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+  export PATH="\$HOME/.local/share/3plug-pro/venv/bin:\$PATH"
   3plug --help
   3plug init
-  3plug doctor
   3plug server preflight
 
 EOF

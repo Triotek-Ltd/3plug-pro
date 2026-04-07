@@ -16,9 +16,8 @@ Run these steps in this order:
 3. Switch to the 3plug operator user.
 4. Install `3plug` from GitHub.
 5. Run `3plug init`.
-6. Run `3plug doctor`.
-7. Run `3plug server preflight`.
-8. Use the preflight output to implement or run server dependency and Bench installation.
+6. Run `3plug server preflight`.
+7. Use the preflight output to implement or run server dependency and Bench installation.
 
 ## New Server Path
 
@@ -77,31 +76,33 @@ What this does:
 Install `3plug` from GitHub:
 
 ```bash
-python3 -m pip install --user "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+python3 -m venv ~/.local/share/3plug-pro/venv
+~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
 ```
 
 What this does:
 
+* creates a dedicated virtual environment for the 3plug-pro CLI
 * installs the current 3plug-pro CLI from the `main` branch
 * uses the `cli/` package inside this repository
-* installs into the operator user's Python user environment
+* avoids Ubuntu/Debian system Python restrictions for externally managed environments
 
-Ensure the user-local Python bin path is active:
+Ensure the 3plug-pro virtual environment bin path is active:
 
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
 What this does:
 
-* makes the `3plug` command available in the current shell when pip installs it into `~/.local/bin`
+* makes the `3plug` command available in the current shell
 
 Run the first 3plug checks:
 
 ```bash
 3plug --help
 3plug init
-3plug doctor
 3plug server preflight
 ```
 
@@ -109,8 +110,9 @@ What these do:
 
 * `3plug --help` confirms the CLI is installed and runnable
 * `3plug init` creates local ignored 3plug state
-* `3plug doctor` checks the expected project/control-plane layout
 * `3plug server preflight` checks what the Linux server already has before Bench installation
+
+`3plug doctor` is currently a developer workspace check for the source repository layout. Do not use it as the first server-runtime check on a pip-installed server.
 
 ## Existing Server Path
 
@@ -192,7 +194,7 @@ Currently implemented:
 
 * Git URL CLI install
 * `3plug init`
-* `3plug doctor`
+* `3plug doctor` for source workspace checks
 * `3plug server preflight`
 * app and stack catalog inspection
 

@@ -49,6 +49,27 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(payload["branch"], "main")
         self.assertEqual(payload["upstream_tracking_branch"], "upstream-v16")
 
+    def test_json_app_show_uses_packaged_catalog_without_repo_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = main(
+                    [
+                        "--root",
+                        tmp,
+                        "--format",
+                        "json",
+                        "app",
+                        "show",
+                        "erpnext",
+                    ]
+                )
+
+            self.assertEqual(code, 0, stderr.getvalue())
+            payload = json.loads(stdout.getvalue())
+            self.assertEqual(payload["repo"], "triotek-erpnext")
+
     def test_json_stack_list_smoke(self) -> None:
         code, stdout, stderr = self.run_cli("--format", "json", "stack", "list")
 

@@ -26,7 +26,10 @@ The goal is to support practical platform operations such as:
 Install the current CLI directly from GitHub:
 
 ```bash
-python3 -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+python3 -m venv ~/.local/share/3plug-pro/venv
+~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
 Then verify the CLI:
@@ -64,10 +67,11 @@ cd /opt/3plug-pro
 Install the CLI and run the first checks:
 
 ```bash
-python3 -m pip install --user "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
-export PATH="$HOME/.local/bin:$PATH"
+python3 -m venv ~/.local/share/3plug-pro/venv
+~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 3plug init
-3plug doctor
 3plug server preflight
 ```
 
@@ -81,13 +85,14 @@ The foundation CLI is available and supports:
 
 * `3plug --help`
 * `3plug init`
-* `3plug doctor`
 * `3plug server preflight`
 * `3plug app list`
 * `3plug app show <app>`
 * `3plug stack list`
 * `3plug bench list`
 * `3plug job list`
+
+`3plug doctor` is currently a developer workspace check for this repository layout. Use `3plug server preflight` on pip-installed servers.
 
 The next implementation phase will make these server lifecycle commands operational:
 
