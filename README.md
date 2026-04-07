@@ -23,10 +23,20 @@ The goal is to support practical platform operations such as:
 
 ## First-Time Server Setup
 
-After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, run the bootstrap script first:
+After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, run the bootstrap script first.
+
+If this repository is public:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
+sudo bash /tmp/bootstrap_3plug_server.sh
+```
+
+If this repository is private, use a GitHub token with read access:
+
+```bash
+read -rsp "GitHub token: " GITHUB_TOKEN; echo
+curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.raw" "https://api.github.com/repos/Triotek-Ltd/3plug-pro/contents/scripts/linux/bootstrap_3plug_server.sh?ref=main" -o /tmp/bootstrap_3plug_server.sh
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
@@ -57,6 +67,14 @@ python3 -m venv ~/.local/share/3plug-pro/venv
 ~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
 ~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
+```
+
+If this repository is private, use the same token for the pip install:
+
+```bash
+read -rsp "GitHub token: " GITHUB_TOKEN; echo
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://x-access-token:${GITHUB_TOKEN}@github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+unset GITHUB_TOKEN
 ```
 
 This uses a venv so the install does not modify the system Python environment.

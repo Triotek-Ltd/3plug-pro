@@ -23,10 +23,20 @@ Run these steps in this order:
 
 On a new Ubuntu/Debian server, start as `root` or with a sudo-capable admin user.
 
-Download and run the bootstrap script:
+Download and run the bootstrap script.
+
+If the repository is public:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
+sudo bash /tmp/bootstrap_3plug_server.sh
+```
+
+If the repository is private, use a GitHub token with read access:
+
+```bash
+read -rsp "GitHub token: " GITHUB_TOKEN; echo
+curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github.raw" "https://api.github.com/repos/Triotek-Ltd/3plug-pro/contents/scripts/linux/bootstrap_3plug_server.sh?ref=main" -o /tmp/bootstrap_3plug_server.sh
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
@@ -79,6 +89,14 @@ Install `3plug` from GitHub:
 python3 -m venv ~/.local/share/3plug-pro/venv
 ~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
 ~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+```
+
+If the repository is private, use the same token for the pip install:
+
+```bash
+read -rsp "GitHub token: " GITHUB_TOKEN; echo
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://x-access-token:${GITHUB_TOKEN}@github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+unset GITHUB_TOKEN
 ```
 
 What this does:
@@ -136,6 +154,8 @@ If the user or workspace is missing, run the bootstrap script:
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
+
+For private repository access, use the GitHub API download command from the new server path above.
 
 If you do not want the script to enable `ufw` automatically, run:
 
