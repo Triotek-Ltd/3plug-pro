@@ -4,6 +4,20 @@
 
 This repository is intended to be the coordination and standards root for the wider 3plug-pro ecosystem under `Triotek-Ltd`.
 
+3plug-pro is the platform we are building in this git repository.
+
+Current design notes live in:
+
+* `design/`
+
+Start implementation planning from:
+
+* `design/roadmap.md`
+
+The local source workspace lives in:
+
+* `3plug/repos/`
+
 ## What belongs here
 
 * architecture and planning

@@ -1,0 +1,90 @@
+from __future__ import annotations
+
+import contextlib
+import io
+import json
+import sys
+import tempfile
+import tomllib
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CLI_ROOT = REPO_ROOT / "cli"
+if str(CLI_ROOT) not in sys.path:
+    sys.path.insert(0, str(CLI_ROOT))
+
+from threeplugpro.cli import main  # noqa: E402
+
+
+class CliSmokeTests(unittest.TestCase):
+    def run_cli(self, *args: str) -> tuple[int, str, str]:
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = main(["--root", str(REPO_ROOT), *args])
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def test_console_entry_points_are_declared(self) -> None:
+        pyproject = tomllib.loads((CLI_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+        scripts = pyproject["project"]["scripts"]
+
+        self.assertEqual(scripts["3plug"], "threeplugpro.cli:main")
+        self.assertEqual(scripts["3plug-pro"], "threeplugpro.cli:main")
+
+    def test_doctor_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("doctor")
+
+        self.assertEqual(code, 0, stderr)
+        self.assertIn("3plug-pro doctor", stdout)
+        self.assertIn("app catalog", stdout)
+
+    def test_json_app_show_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "app", "show", "erpnext")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["repo"], "triotek-erpnext")
+        self.assertEqual(payload["branch"], "main")
+        self.assertEqual(payload["upstream_tracking_branch"], "upstream-v16")
+
+    def test_json_stack_list_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "stack", "list")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertTrue(any(stack["key"] == "erpnext-core" for stack in payload))
+
+    def test_init_uses_config_and_data_overrides(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config_path = root / "local-config.json"
+            data_dir = root / "local-data"
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = main(
+                    [
+                        "--root",
+                        str(root),
+                        "--config-path",
+                        str(config_path),
+                        "--data-dir",
+                        str(data_dir),
+                        "--format",
+                        "json",
+                        "init",
+                    ]
+                )
+
+            self.assertEqual(code, 0, stderr.getvalue())
+            self.assertTrue(config_path.exists())
+            self.assertTrue(data_dir.exists())
+            payload = json.loads(stdout.getvalue())
+            self.assertEqual(Path(payload["config_path"]).resolve(), config_path.resolve())
+            self.assertEqual(Path(payload["data_dir"]).resolve(), data_dir.resolve())
+
+
+if __name__ == "__main__":
+    unittest.main()

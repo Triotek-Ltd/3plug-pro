@@ -1,12 +1,29 @@
-# 3plug-pro CLI Scaffold
+# 3plug-pro CLI
 
-This folder is a local scaffold for the future `3plug-pro` CLI.
+This folder contains the first Python CLI for 3plug-pro.
 
-The first version should focus on:
+The operator-facing command is:
+
+```text
+3plug
+```
+
+The compatibility/project command is:
+
+```text
+3plug-pro
+```
+
+The first implementation focuses on:
 
 * workspace checks
-* repo-plan reporting
-* publish-plan reporting
-* auth-status checks
+* design and repo-plan reporting
+* catalog listing
+* server preflight checks
+* safe planning before Bench install and site operations
 
-This is a scaffold only, not yet a complete CLI implementation.
+Run the local smoke tests from the repo root with:
+
+```text
+python -m unittest discover -s cli/tests
+```

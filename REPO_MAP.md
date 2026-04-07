@@ -24,8 +24,8 @@
 
 ## First commercial vertical repos
 
-* `Triotek-Ltd/triotek-utility`
-* `Triotek-Ltd/triotek-property`
+* `Triotek-Ltd/triotek-utility-ops`
+* `Triotek-Ltd/triotek-real-estate-ops`
 
 ## Optional internalized app repos
 

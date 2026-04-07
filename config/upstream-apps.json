@@ -1,0 +1,188 @@
+[
+  {
+    "name": "triotek-hrms",
+    "upstream_url": "https://github.com/frappe/hrms.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-crm",
+    "upstream_url": "https://github.com/frappe/crm.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-helpdesk",
+    "upstream_url": "https://github.com/frappe/helpdesk.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-insights",
+    "upstream_url": "https://github.com/frappe/insights.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-wiki",
+    "upstream_url": "https://github.com/frappe/wiki.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-print-designer",
+    "upstream_url": "https://github.com/frappe/print_designer.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-builder",
+    "upstream_url": "https://github.com/frappe/builder.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-mail",
+    "upstream_url": "https://github.com/frappe/mail.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-gameplan",
+    "upstream_url": "https://github.com/frappe/gameplan.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-lending",
+    "upstream_url": "https://github.com/frappe/lending.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-education",
+    "upstream_url": "https://github.com/frappe/education.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-lms",
+    "upstream_url": "https://github.com/frappe/lms.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-webshop",
+    "upstream_url": "https://github.com/frappe/webshop.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-posawesome",
+    "upstream_url": "https://github.com/ucraft-com/POS-Awesome.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-healthcare",
+    "upstream_url": "https://github.com/ESS-LLP/healthcare.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-utility-billing",
+    "upstream_url": "https://github.com/navariltd/utility-billing.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-agriculture",
+    "upstream_url": "https://github.com/frappe/agriculture.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-non-profit",
+    "upstream_url": "https://github.com/frappe/non_profit.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-hospitality-base",
+    "upstream_url": "https://github.com/frappe/hospitality.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-property-management-base",
+    "upstream_url": "https://github.com/aakvatech/PropMS.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-logistics-base",
+    "upstream_url": "https://github.com/hrgadeha/logistics.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-construction-base",
+    "upstream_url": "https://github.com/aidgoc/fibertrack-pro.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-telecom-base",
+    "upstream_url": "https://github.com/macrobian88/frappe_zain_subscriptions.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-livestock-base",
+    "upstream_url": "https://github.com/Janviere-dev/Livestock_Management.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-services-base",
+    "upstream_url": "https://github.com/j4ptl/FSM-field_service_management.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-aviation-base",
+    "upstream_url": "https://github.com/RohanRks23/airplane_mode.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-manufacturing-base",
+    "upstream_url": "https://github.com/efeone/aumms.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-restaurant-base",
+    "upstream_url": "https://github.com/alialiens/erpnext_restaurant.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-vehicle-trading-base",
+    "upstream_url": "https://github.com/AddonSolutionsForERPnext/Custom_Car_Trading_App.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-public-procurement-base",
+    "upstream_url": "https://github.com/buff0k/procurement.git",
+    "repo_group": "apps-vertical",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  },
+  {
+    "name": "triotek-frappe-mpesa-payments",
+    "upstream_url": "https://github.com/navariltd/frappe-mpsa-payments.git",
+    "repo_group": "apps-core",
+    "branch_candidates": ["version-16-hotfix", "version-16", "main", "develop", "master"]
+  }
+]

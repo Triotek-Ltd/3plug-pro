@@ -6,8 +6,9 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.scripts]
+3plug = "threeplugpro.cli:main"
 3plug-pro = "threeplugpro.cli:main"
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"

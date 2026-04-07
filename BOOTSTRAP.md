@@ -6,11 +6,17 @@ This file defines the intended local bootstrap pattern for developers.
 
 ## Local workspace pattern
 
-Recommended local source areas:
+Recommended local source area:
 
-* `rnd/3plug/sources/upstream-mirrors/`
-* `rnd/3plug/sources/triotek-native/`
-* `rnd/3plug/sources/catalog/`
+* `rnd/3plug/repos/`
+
+Recommended repo groups:
+
+* `rnd/3plug/repos/platform/`
+* `rnd/3plug/repos/apps-core/`
+* `rnd/3plug/repos/apps-vertical/`
+* `rnd/3plug/repos/stacks/`
+* `rnd/3plug/repos/docs/`
 
 ## Principle
 

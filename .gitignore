@@ -1,0 +1,68 @@
+# 3plug-pro local source workspace
+#
+# Component repos are managed as their own repositories. Do not commit their
+# checked-out contents into this coordination repo.
+/3plug/repos/
+
+# Local Bench runtimes and runtime state
+/benches/
+/sites/
+/logs/
+/run/
+/tmp/
+/.3plug/
+/.bench/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+*.egg-info/
+build/
+dist/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node and frontend tooling
+node_modules/
+.npm/
+.yarn/
+.pnp.*
+coverage/
+
+# Frappe / Bench generated files
+assets/
+private/
+public/files/
+*.sql
+*.sql.gz
+*.tgz
+*.tar
+*.tar.gz
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Secrets and local credentials
+*.pem
+*.key
+*.crt
+passwords.txt
+secrets.json
