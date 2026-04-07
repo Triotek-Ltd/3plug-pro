@@ -18,6 +18,40 @@ The local source workspace lives in:
 
 * `3plug/repos/`
 
+## First Server Target
+
+The first production-like target can be an actual Linux server. Install the current CLI from GitHub with:
+
+```bash
+python3 -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+```
+
+Then run:
+
+```bash
+3plug --help
+3plug init
+3plug doctor
+3plug server preflight
+```
+
+At the current stage, these commands are expected to work:
+
+* `3plug --help`
+* `3plug init`
+* `3plug doctor`
+* `3plug server preflight`
+* `3plug app show erpnext`
+* `3plug stack list`
+
+These commands are present but still plan/foundation commands until the Linux server phase is implemented:
+
+* `3plug install server-dependencies`
+* `3plug install bench`
+* `3plug bench create production`
+
+Use `3plug server preflight` on the actual server first, then use its output to finish the real server dependency and Bench install handlers.
+
 ## What belongs here
 
 * architecture and planning
