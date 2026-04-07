@@ -43,15 +43,37 @@ The compatibility command is also available:
 
 ## First Server Check
 
-On a Linux server, start with:
+On a new Ubuntu/Debian server, bootstrap the operator user and workspace first:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
+sudo bash /tmp/bootstrap_3plug_server.sh
+```
+
+This prepares the server before normal 3plug work by installing minimal Python/Git tooling, creating the `threeplug` operator user, creating `/opt/3plug-pro`, and allowing SSH before enabling the firewall.
+
+If the server uses a custom SSH firewall profile, see `design/server-bootstrap-guide.md` before enabling the firewall.
+
+Then switch to the operator user:
+
+```bash
+su - threeplug
+cd /opt/3plug-pro
+```
+
+Install the CLI and run the first checks:
+
+```bash
+python3 -m pip install --user "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+export PATH="$HOME/.local/bin:$PATH"
 3plug init
 3plug doctor
 3plug server preflight
 ```
 
 Use the preflight output to confirm what the server already has and what still needs to be installed before Bench is provisioned.
+
+For existing servers or manual firewall handling, see `design/server-bootstrap-guide.md`.
 
 ## Current Status
 
@@ -101,5 +123,6 @@ Start with:
 * `design/roadmap.md`
 * `design/roadmap-status.md`
 * `design/linux-vm-target-plan.md`
+* `design/server-bootstrap-guide.md`
 
 The first production-like target is an actual Linux server or local Linux VM. The next milestone is to run `3plug server preflight` there and use the results to implement the real server dependency and Bench install handlers.

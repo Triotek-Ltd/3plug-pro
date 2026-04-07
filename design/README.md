@@ -12,6 +12,7 @@ This folder contains the working design notes for 3plug-pro.
 * `bench-control-plane-start.md`
 * `bench-action-catalog.md`
 * `server-dependency-plan.md`
+* `server-bootstrap-guide.md`
 * `remote-repo-verification.md`
 * `linux-vm-target-plan.md`
 * `architecture.md`
