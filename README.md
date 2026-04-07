@@ -1,89 +1,105 @@
 # 3plug-pro
 
-3plug-pro is Triotek's governed platform layer for operating Frappe-based systems through company-controlled repositories, controlled releases, stack manifests, and operational automation.
+3plug-pro is Triotek's managed operations layer for Frappe and ERPNext environments.
 
-This repository is intended to be the coordination and standards root for the wider 3plug-pro ecosystem under `Triotek-Ltd`.
+It is designed to give teams a safer, governed way to operate multiple Frappe sites through Bench while keeping source control, app selection, lifecycle actions, and auditability under Triotek control.
 
-3plug-pro is the platform we are building in this git repository.
+## What It Does
 
-Current design notes live in:
+3plug-pro is being built as a Bench-first control plane:
 
-* `design/`
+```text
+3plug-pro -> Bench -> multiple benches -> multiple Frappe/ERPNext sites
+```
 
-Start implementation planning from:
+The goal is to support practical platform operations such as:
 
-* `design/roadmap.md`
+* preparing a Linux server for Frappe/ERPNext
+* installing and managing Bench
+* creating and registering multiple Bench environments
+* installing approved Triotek apps from governed repositories
+* creating, migrating, backing up, and restoring sites
+* recording operational actions as jobs and audit history
 
-The local source workspace lives in:
+## Install
 
-* `3plug/repos/`
-
-## First Server Target
-
-The first production-like target can be an actual Linux server. Install the current CLI from GitHub with:
+Install the current CLI directly from GitHub:
 
 ```bash
 python3 -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
 ```
 
-Then run:
+Then verify the CLI:
 
 ```bash
 3plug --help
+```
+
+The compatibility command is also available:
+
+```bash
+3plug-pro --help
+```
+
+## First Server Check
+
+On a Linux server, start with:
+
+```bash
 3plug init
 3plug doctor
 3plug server preflight
 ```
 
-At the current stage, these commands are expected to work:
+Use the preflight output to confirm what the server already has and what still needs to be installed before Bench is provisioned.
+
+## Current Status
+
+The foundation CLI is available and supports:
 
 * `3plug --help`
 * `3plug init`
 * `3plug doctor`
 * `3plug server preflight`
-* `3plug app show erpnext`
+* `3plug app list`
+* `3plug app show <app>`
 * `3plug stack list`
+* `3plug bench list`
+* `3plug job list`
 
-These commands are present but still plan/foundation commands until the Linux server phase is implemented:
+The next implementation phase will make these server lifecycle commands operational:
 
 * `3plug install server-dependencies`
 * `3plug install bench`
 * `3plug bench create production`
 
-Use `3plug server preflight` on the actual server first, then use its output to finish the real server dependency and Bench install handlers.
+Until that phase is complete, those lifecycle commands should be treated as planning/foundation commands rather than complete production installers.
 
-## What belongs here
+## Source Policy
 
-* architecture and planning
-* platform standards
-* source-governance rules
-* branch and release model
-* stack and repo strategy
-* developer onboarding
-* bootstrap scripts
-* workspace conventions
+3plug-pro is designed to provision from Triotek-controlled repositories by default.
 
-## What does not belong here
+For Frappe v16 work:
 
-This repo should not contain all platform and app code directly.
+* `main` is the Triotek-controlled install branch.
+* `upstream-v16` is used for upstream tracking and intake review.
+* production app installs should resolve through the approved catalog, not random Git URLs.
 
-Component code should live in dedicated repos such as:
+## Repository Layout
 
-* `triotek-frappe`
-* `triotek-erpnext`
-* `triotek-bench`
-* `3plug-pro-control`
-* `3plug-pro-catalog`
-* `3plug-pro-ops`
-* `triotek-payments`
-* `triotek-recon`
-* `triotek-forensics`
+Important paths:
 
-## Ecosystem intent
+* `cli/` contains the installable Python CLI package.
+* `config/app-catalog.json` contains the approved app and stack catalog.
+* `design/` contains architecture notes, roadmap, and implementation planning.
+* `3plug/repos/` is the local source workspace for Bench, Frappe, ERPNext, Press reference code, and app repos. It is intentionally ignored by this repository.
 
-3plug-pro exists to ensure that:
+## Roadmap
 
-* Triotek owns the source of truth
-* 3plug-pro provisions only from governed sources
-* upstream changes are absorbed intentionally
-* platform operations are traceable and auditable
+Start with:
+
+* `design/roadmap.md`
+* `design/roadmap-status.md`
+* `design/linux-vm-target-plan.md`
+
+The first production-like target is an actual Linux server or local Linux VM. The next milestone is to run `3plug server preflight` there and use the results to implement the real server dependency and Bench install handlers.
