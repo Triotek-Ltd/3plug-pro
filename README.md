@@ -21,63 +21,69 @@ The goal is to support practical platform operations such as:
 * creating, migrating, backing up, and restoring sites
 * recording operational actions as jobs and audit history
 
-## Install
+## First-Time Server Setup
 
-Install the current CLI directly from GitHub:
-
-```bash
-python3 -m venv ~/.local/share/3plug-pro/venv
-~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
-~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
-export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
-```
-
-Then verify the CLI:
-
-```bash
-3plug --help
-```
-
-The compatibility command is also available:
-
-```bash
-3plug-pro --help
-```
-
-## First Server Check
-
-On a new Ubuntu/Debian server, bootstrap the operator user and workspace first:
+After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, run the bootstrap script first:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
 sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
-This prepares the server before normal 3plug work by installing minimal Python/Git tooling, creating the `threeplug` operator user, creating `/opt/3plug-pro`, and allowing SSH before enabling the firewall.
+This script performs the pre-CLI server setup:
 
-If the server uses a custom SSH firewall profile, see `design/server-bootstrap-guide.md` before enabling the firewall.
+* installs minimal tools needed before `3plug` can run: Python, pip, venv, Git, curl, sudo, and UFW
+* creates the `threeplug` operator user if it does not already exist
+* adds `threeplug` to the sudo group
+* creates `/opt/3plug-pro`
+* gives `threeplug` ownership of `/opt/3plug-pro`
+* allows SSH in UFW before enabling the firewall
 
-Then switch to the operator user:
+If the server uses a custom SSH firewall profile, read `design/server-bootstrap-guide.md` before enabling the firewall.
+
+Then switch into the operator user and workspace:
 
 ```bash
 su - threeplug
 cd /opt/3plug-pro
 ```
 
-Install the CLI and run the first checks:
+This avoids running normal platform operations directly as `root`.
+
+Install the current 3plug-pro CLI from GitHub into a dedicated virtual environment:
 
 ```bash
 python3 -m venv ~/.local/share/3plug-pro/venv
 ~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
 ~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
+```
+
+This uses a venv so the install does not modify the system Python environment.
+
+Run the first CLI checks in this order:
+
+```bash
+3plug --help
 3plug init
 3plug server preflight
 ```
 
+What these commands do:
+
+* `3plug --help` confirms the CLI is installed and available.
+* `3plug init` creates local 3plug-pro state for this server.
+* `3plug server preflight` checks the server OS, Python, Node, database, Redis, Nginx, Supervisor, PDF tooling, and related prerequisites before Bench installation.
+
 Use the preflight output to confirm what the server already has and what still needs to be installed before Bench is provisioned.
 
-For existing servers or manual firewall handling, see `design/server-bootstrap-guide.md`.
+For existing servers, custom firewall handling, or manual equivalent commands, see `design/server-bootstrap-guide.md`.
+
+The compatibility command is also available:
+
+```bash
+3plug-pro --help
+```
 
 ## Current Status
 
