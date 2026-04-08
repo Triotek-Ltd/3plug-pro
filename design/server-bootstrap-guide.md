@@ -1,13 +1,24 @@
 # Server Bootstrap Guide
 
-This guide explains what to run before `3plug` takes over server checks and Bench lifecycle work.
+This guide explains the current shell-based server lifecycle around `3plug` before the full control plane and UI take over.
 
 Use it for both:
 
 * a new Linux server
 * an existing Linux server that needs to become a 3plug-pro managed target
+* an existing 3plug-managed server that needs update or uninstall actions
 
-## Order of Operations
+## Lifecycle Model
+
+The current server lifecycle is:
+
+1. `bootstrap` the server so `3plug` can run
+2. `update` the installed `3plug` CLI on existing servers
+3. `uninstall` the managed `3plug` footprint when a server is being retired, rebuilt, or moved
+
+This naming is deliberate because these actions should eventually appear in the 3plug UI as Press-like backend jobs instead of stand-alone shell steps.
+
+## Bootstrap Order of Operations
 
 Run these steps in this order:
 
@@ -44,6 +55,7 @@ What this does:
 
 * installs only the minimal host tools needed before `3plug` can run
 * creates the `threeplug` operator user if it does not already exist
+* can prompt interactively for the operator password when `THREEPLUG_SET_PASSWORD=1`
 * grants the operator user sudo access
 * creates `/opt/3plug-pro`
 * gives the operator user ownership of `/opt/3plug-pro`
@@ -56,7 +68,13 @@ If the server uses a custom UFW SSH profile, run:
 sudo SSH_UFW_PROFILE=<profile-name> bash /tmp/bootstrap_3plug_server.sh
 ```
 
-If the operator user needs direct SSH login or password-based sudo, set a password or install SSH keys after the bootstrap step:
+If you want bootstrap to prompt for the operator password during the setup flow, run:
+
+```bash
+sudo THREEPLUG_SET_PASSWORD=1 bash /tmp/bootstrap_3plug_server.sh
+```
+
+If you skipped that flag and still need direct SSH login or password-based sudo, set a password after the bootstrap step:
 
 ```bash
 sudo passwd threeplug
@@ -191,6 +209,85 @@ What these do:
 * `sudo ufw --force enable` enables the firewall without an interactive prompt
 * the second status check confirms the final active rules
 
+## Update Existing Server Install
+
+If the last commands you already ran on a server were:
+
+```bash
+3plug --help
+3plug init
+3plug server preflight
+```
+
+then the next operator step is usually:
+
+```bash
+3plug server update
+```
+
+That shows the exact update command and records a local job entry.
+
+When you are ready to run the update directly through the CLI, use:
+
+```bash
+3plug server update --execute
+```
+
+Use the update script when the server already has the `threeplug` operator user and workspace and you want to refresh the installed CLI directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/update_3plug_server.sh -o /tmp/update_3plug_server.sh
+sudo bash /tmp/update_3plug_server.sh
+```
+
+What this does:
+
+* verifies that the operator user already exists
+* verifies or creates the workspace path
+* upgrades `pip` in the operator virtual environment
+* upgrades the installed `3plug` CLI from the configured Git package URL
+* preserves local workspace state under `/opt/3plug-pro`
+
+## Uninstall 3plug From a Server
+
+To inspect the uninstall action first through the CLI, run:
+
+```bash
+3plug server uninstall --remove-user
+```
+
+To run the uninstall through the CLI on the server itself, use:
+
+```bash
+3plug server uninstall --remove-user --execute
+```
+
+Use the uninstall script when you want to remove the managed 3plug footprint from a server directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/uninstall_3plug_server.sh -o /tmp/uninstall_3plug_server.sh
+sudo bash /tmp/uninstall_3plug_server.sh
+```
+
+Default uninstall behavior:
+
+* removes `/opt/3plug-pro`
+* removes the operator CLI virtual environment
+* keeps the `threeplug` operator user
+* removes the operator user from `sudo` if the user is kept
+
+To also remove the operator user and home directory:
+
+```bash
+sudo REMOVE_USER=1 bash /tmp/uninstall_3plug_server.sh
+```
+
+For non-interactive cleanup, add `THREEPLUG_FORCE=1`:
+
+```bash
+sudo THREEPLUG_FORCE=1 REMOVE_USER=1 bash /tmp/uninstall_3plug_server.sh
+```
+
 ## Boundary Between Script and CLI
 
 The bootstrap script handles only the minimum work needed before `3plug` can run:
@@ -199,6 +296,8 @@ The bootstrap script handles only the minimum work needed before `3plug` can run
 * install minimal Python/Git tooling
 * create the workspace directory
 * protect SSH before enabling the firewall
+
+The update and uninstall scripts currently extend that shell-based lifecycle until equivalent actions move behind the `3plug` control plane.
 
 The `3plug` CLI should own the platform work after that:
 
@@ -216,6 +315,10 @@ Currently implemented:
 * `3plug init`
 * `3plug doctor` for source workspace checks
 * `3plug server preflight`
+* `3plug server bootstrap`
+* `3plug server update`
+* `3plug server uninstall`
+* local job recording for server actions
 * app and stack catalog inspection
 
 Next implementation phase:
@@ -223,3 +326,4 @@ Next implementation phase:
 * make `3plug install server-dependencies` real on Ubuntu/Debian
 * make `3plug install bench` real
 * make `3plug bench create production` real
+* move bootstrap, update, and uninstall flows behind auditable `3plug` server actions and the future UI

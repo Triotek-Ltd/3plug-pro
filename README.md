@@ -21,6 +21,16 @@ The goal is to support practical platform operations such as:
 * creating, migrating, backing up, and restoring sites
 * recording operational actions as jobs and audit history
 
+## Server Lifecycle
+
+The current operator lifecycle is:
+
+* bootstrap the server so `3plug` can run
+* update the installed `3plug` CLI on existing servers
+* uninstall the managed `3plug` footprint when a server is retired or rebuilt
+
+This is intentionally shaped to become backend job actions for a future Press-like 3plug UI.
+
 ## First-Time Server Setup
 
 After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, run the bootstrap script first.
@@ -44,10 +54,17 @@ This script performs the pre-CLI server setup:
 
 * installs minimal tools needed before `3plug` can run: Python, pip, venv, Git, curl, sudo, and UFW
 * creates the `threeplug` operator user if it does not already exist
+* optionally prompts for the operator password when `THREEPLUG_SET_PASSWORD=1`
 * adds `threeplug` to the sudo group
 * creates `/opt/3plug-pro`
 * gives `threeplug` ownership of `/opt/3plug-pro`
 * allows SSH in UFW before enabling the firewall
+
+If you want bootstrap to prompt for the operator password, run:
+
+```bash
+sudo THREEPLUG_SET_PASSWORD=1 bash /tmp/bootstrap_3plug_server.sh
+```
 
 If the server uses a custom SSH firewall profile, read `design/server-bootstrap-guide.md` before enabling the firewall.
 
@@ -97,6 +114,68 @@ Use the preflight output to confirm what the server already has and what still n
 
 For existing servers, custom firewall handling, or manual equivalent commands, see `design/server-bootstrap-guide.md`.
 
+## Update Existing Server Install
+
+If the last commands you already ran on a server were:
+
+```bash
+3plug --help
+3plug init
+3plug server preflight
+```
+
+then the next safe action is to inspect the update command first:
+
+```bash
+3plug server update
+```
+
+That prints the exact server-side update command and records a local job entry.
+
+When you are ready to run the update on the server itself, use:
+
+```bash
+3plug server update --execute
+```
+
+Use the update script directly if you prefer the shell-script path on a server that already has the `threeplug` operator user and workspace:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/update_3plug_server.sh -o /tmp/update_3plug_server.sh
+sudo bash /tmp/update_3plug_server.sh
+```
+
+This refreshes the installed `3plug` CLI in the operator user's virtual environment without removing local workspace state.
+
+## Uninstall From a Server
+
+To inspect the uninstall command from the CLI first, run:
+
+```bash
+3plug server uninstall --remove-user
+```
+
+When you are ready to actually run the uninstall on the server, use:
+
+```bash
+3plug server uninstall --remove-user --execute
+```
+
+Use the uninstall script directly when retiring a server or removing the 3plug-managed footprint:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/uninstall_3plug_server.sh -o /tmp/uninstall_3plug_server.sh
+sudo bash /tmp/uninstall_3plug_server.sh
+```
+
+By default this removes the workspace and CLI virtual environment but keeps the operator user.
+
+To also remove the operator user:
+
+```bash
+sudo REMOVE_USER=1 bash /tmp/uninstall_3plug_server.sh
+```
+
 The compatibility command is also available:
 
 ```bash
@@ -110,11 +189,15 @@ The foundation CLI is available and supports:
 * `3plug --help`
 * `3plug init`
 * `3plug server preflight`
+* `3plug server bootstrap`
+* `3plug server update`
+* `3plug server uninstall`
 * `3plug app list`
 * `3plug app show <app>`
 * `3plug stack list`
 * `3plug bench list`
 * `3plug job list`
+* `3plug job show <job-id>`
 
 `3plug doctor` is currently a developer workspace check for this repository layout. Use `3plug server preflight` on pip-installed servers.
 
@@ -124,7 +207,7 @@ The next implementation phase will make these server lifecycle commands operatio
 * `3plug install bench`
 * `3plug bench create production`
 
-Until that phase is complete, those lifecycle commands should be treated as planning/foundation commands rather than complete production installers.
+Until that phase is complete, those lifecycle commands should be treated as planning/foundation commands rather than complete production installers. The bootstrap, update, and uninstall scripts remain the current shell-based server lifecycle helpers before those actions move behind the `3plug` control plane and UI.
 
 ## Source Policy
 

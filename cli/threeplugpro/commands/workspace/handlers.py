@@ -6,6 +6,7 @@ import shutil
 
 from threeplugpro.core import (
     APP_CATALOG,
+    ensure_state_db,
     local_config_path,
     local_data_dir,
     local_state_dir,
@@ -48,6 +49,7 @@ def run_init(args: argparse.Namespace) -> int:
 
     state_dir.mkdir(exist_ok=True)
     data_dir.mkdir(parents=True, exist_ok=True)
+    db_path = ensure_state_db(root, args)
 
     if not config_path.exists():
         config_path.parent.mkdir(parents=True, exist_ok=True)
@@ -75,6 +77,7 @@ def run_init(args: argparse.Namespace) -> int:
         "state_dir": state_dir,
         "config_path": config_path,
         "data_dir": data_dir,
+        "state_db": db_path,
     }
     if output_json(args, payload):
         return 0
@@ -82,4 +85,5 @@ def run_init(args: argparse.Namespace) -> int:
     print(f"Initialized local state at {state_dir}")
     print(f"Local config: {config_path}")
     print(f"Local data: {data_dir}")
+    print(f"Local state DB: {db_path}")
     return 0

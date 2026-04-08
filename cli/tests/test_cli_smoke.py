@@ -77,6 +77,51 @@ class CliSmokeTests(unittest.TestCase):
         payload = json.loads(stdout)
         self.assertTrue(any(stack["key"] == "erpnext-core" for stack in payload))
 
+    def test_server_bootstrap_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("server", "bootstrap")
+
+        self.assertEqual(code, 0, stderr)
+        self.assertIn("3plug server bootstrap", stdout)
+        self.assertIn("bootstrap_3plug_server.sh", stdout)
+        self.assertIn("Local execute command:", stdout)
+
+    def test_json_server_update_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "server", "update")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "update")
+        self.assertTrue(payload["script_exists"])
+        self.assertTrue(payload["preserves_workspace_state"])
+        self.assertIn("THREEPLUG_PACKAGE_URL", payload["env"])
+
+    def test_json_server_uninstall_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "server", "uninstall")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "uninstall")
+        self.assertTrue(payload["script_exists"])
+        self.assertTrue(payload["requires_confirmation"])
+
+    def test_json_server_bootstrap_with_options_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli(
+            "--format",
+            "json",
+            "server",
+            "bootstrap",
+            "--set-password",
+            "--no-firewall-enable",
+            "--user",
+            "ops",
+        )
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["operator_user"], "ops")
+        self.assertEqual(payload["env"]["THREEPLUG_SET_PASSWORD"], "1")
+        self.assertEqual(payload["env"]["FIREWALL_AUTO_ENABLE"], "0")
+
     def test_init_uses_config_and_data_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -105,6 +150,42 @@ class CliSmokeTests(unittest.TestCase):
             payload = json.loads(stdout.getvalue())
             self.assertEqual(Path(payload["config_path"]).resolve(), config_path.resolve())
             self.assertEqual(Path(payload["data_dir"]).resolve(), data_dir.resolve())
+            self.assertTrue(Path(payload["state_db"]).exists())
+
+    def test_server_commands_create_jobs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                init_code = main(["--root", str(root), "--format", "json", "init"])
+            self.assertEqual(init_code, 0, stderr.getvalue())
+
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = main(["--root", str(root), "--format", "json", "server", "update"])
+            self.assertEqual(code, 0, stderr.getvalue())
+            payload = json.loads(stdout.getvalue())
+            self.assertIn("job_id", payload)
+
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                list_code = main(["--root", str(root), "--format", "json", "job", "list"])
+            self.assertEqual(list_code, 0, stderr.getvalue())
+            list_payload = json.loads(stdout.getvalue())
+            self.assertTrue(any(job["id"] == payload["job_id"] for job in list_payload["jobs"]))
+
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                show_code = main(["--root", str(root), "--format", "json", "job", "show", payload["job_id"]])
+            self.assertEqual(show_code, 0, stderr.getvalue())
+            show_payload = json.loads(stdout.getvalue())
+            self.assertEqual(show_payload["id"], payload["job_id"])
+            self.assertEqual(show_payload["action"], "update")
+            self.assertTrue(len(show_payload["audit_events"]) >= 1)
 
 
 if __name__ == "__main__":

@@ -4,9 +4,12 @@ import argparse
 from importlib import resources
 import json
 from pathlib import Path
+import sqlite3
 import shutil
 import subprocess
+from datetime import datetime, timezone
 from typing import Any, Iterable
+from uuid import uuid4
 
 
 PROJECT_MARKERS = ("README.md", "design", "config", "cli")
@@ -15,6 +18,7 @@ UPSTREAM_APPS = Path("config") / "upstream-apps.json"
 LOCAL_STATE_DIR = ".3plug"
 LOCAL_CONFIG_FILE = "config.json"
 LOCAL_DATA_DIR = "data"
+STATE_DB_FILE = "state.db"
 
 
 def resolve_root(args: argparse.Namespace) -> Path:
@@ -59,6 +63,211 @@ def local_data_dir(root: Path, args: argparse.Namespace) -> Path:
     if getattr(args, "data_dir", None) is not None:
         return args.data_dir.resolve()
     return local_state_dir(root) / LOCAL_DATA_DIR
+
+
+def state_db_path(root: Path, args: argparse.Namespace) -> Path:
+    return local_data_dir(root, args) / STATE_DB_FILE
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def ensure_state_db(root: Path, args: argparse.Namespace) -> Path:
+    data_dir = local_data_dir(root, args)
+    data_dir.mkdir(parents=True, exist_ok=True)
+    db_path = state_db_path(root, args)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS jobs (
+                id TEXT PRIMARY KEY,
+                command_family TEXT NOT NULL,
+                action TEXT NOT NULL,
+                status TEXT NOT NULL,
+                summary TEXT NOT NULL,
+                details_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS audit_events (
+                id TEXT PRIMARY KEY,
+                job_id TEXT,
+                event_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(job_id) REFERENCES jobs(id)
+            )
+            """
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return db_path
+
+
+def create_job(
+    root: Path,
+    args: argparse.Namespace,
+    *,
+    command_family: str,
+    action: str,
+    status: str,
+    summary: str,
+    details: dict[str, Any],
+) -> str:
+    db_path = ensure_state_db(root, args)
+    now = utc_now()
+    job_id = uuid4().hex
+    payload = json.dumps(details, default=str)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute(
+            """
+            INSERT INTO jobs (id, command_family, action, status, summary, details_json, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (job_id, command_family, action, status, summary, payload, now, now),
+        )
+        conn.execute(
+            """
+            INSERT INTO audit_events (id, job_id, event_type, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                uuid4().hex,
+                job_id,
+                "job.created",
+                json.dumps({"status": status, "summary": summary}, default=str),
+                now,
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    return job_id
+
+
+def update_job(
+    root: Path,
+    args: argparse.Namespace,
+    *,
+    job_id: str,
+    status: str,
+    details: dict[str, Any],
+) -> None:
+    db_path = ensure_state_db(root, args)
+    now = utc_now()
+    payload = json.dumps(details, default=str)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute(
+            """
+            UPDATE jobs
+            SET status = ?, details_json = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (status, payload, now, job_id),
+        )
+        conn.execute(
+            """
+            INSERT INTO audit_events (id, job_id, event_type, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                uuid4().hex,
+                job_id,
+                "job.updated",
+                json.dumps({"status": status}, default=str),
+                now,
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def list_jobs(root: Path, args: argparse.Namespace) -> list[dict[str, Any]]:
+    db_path = ensure_state_db(root, args)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """
+            SELECT id, command_family, action, status, summary, details_json, created_at, updated_at
+            FROM jobs
+            ORDER BY created_at DESC
+            """
+        ).fetchall()
+    finally:
+        conn.close()
+    jobs: list[dict[str, Any]] = []
+    for row in rows:
+        jobs.append(
+            {
+                "id": row["id"],
+                "command_family": row["command_family"],
+                "action": row["action"],
+                "status": row["status"],
+                "summary": row["summary"],
+                "details": json.loads(row["details_json"]),
+                "created_at": row["created_at"],
+                "updated_at": row["updated_at"],
+            }
+        )
+    return jobs
+
+
+def get_job(root: Path, args: argparse.Namespace, job_id: str) -> dict[str, Any] | None:
+    db_path = ensure_state_db(root, args)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            """
+            SELECT id, command_family, action, status, summary, details_json, created_at, updated_at
+            FROM jobs
+            WHERE id = ?
+            """,
+            (job_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        audit_rows = conn.execute(
+            """
+            SELECT id, event_type, payload_json, created_at
+            FROM audit_events
+            WHERE job_id = ?
+            ORDER BY created_at ASC
+            """,
+            (job_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+    return {
+        "id": row["id"],
+        "command_family": row["command_family"],
+        "action": row["action"],
+        "status": row["status"],
+        "summary": row["summary"],
+        "details": json.loads(row["details_json"]),
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+        "audit_events": [
+            {
+                "id": audit_row["id"],
+                "event_type": audit_row["event_type"],
+                "payload": json.loads(audit_row["payload_json"]),
+                "created_at": audit_row["created_at"],
+            }
+            for audit_row in audit_rows
+        ],
+    }
 
 
 def output_json(args: argparse.Namespace, payload: Any) -> bool:
