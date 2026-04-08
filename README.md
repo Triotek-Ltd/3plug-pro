@@ -33,7 +33,9 @@ This is intentionally shaped to become backend job actions for a future Press-li
 
 ## First-Time Server Setup
 
-After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, run the bootstrap script first.
+After logging into a new Ubuntu/Debian server for the first time as `root` or a sudo-capable admin user, use this order.
+
+### Step 1: Bootstrap The Server
 
 This repository is public, so the normal download command is:
 
@@ -68,6 +70,8 @@ sudo THREEPLUG_SET_PASSWORD=1 bash /tmp/bootstrap_3plug_server.sh
 
 If the server uses a custom SSH firewall profile, read `design/server-bootstrap-guide.md` before enabling the firewall.
 
+### Step 2: Switch To The Operator User
+
 Then switch into the operator user and workspace:
 
 ```bash
@@ -76,6 +80,8 @@ cd /opt/3plug-pro
 ```
 
 This avoids running normal platform operations directly as `root`.
+
+### Step 3: Configure Git Identity
 
 Before installing `3plug`, configure Git identity for the operator user. Do this before any `pip install` step or other 3plug lifecycle command:
 
@@ -91,6 +97,8 @@ Or inspect it first through the CLI once the updated command surface is availabl
 ```
 
 This sets `git config --global user.name` and `git config --global user.email` for the operator user. The update/install flow should not proceed before this is configured.
+
+### Step 4: Install The CLI
 
 Then install the current 3plug-pro CLI from GitHub through the gated install script:
 
@@ -114,6 +122,8 @@ unset GITHUB_TOKEN
 ```
 
 This uses a venv so the install does not modify the system Python environment, and it refuses to continue until Git identity is configured.
+
+### Step 5: Run The First Checks
 
 Run the first CLI checks in this order:
 
@@ -143,7 +153,11 @@ If the last commands you already ran on a server were:
 3plug server preflight
 ```
 
-then the next safe action is to inspect the update command first:
+then use this order.
+
+### Step 1: Inspect The Update Command
+
+The next safe action is to inspect the update command first:
 
 ```bash
 3plug server update
@@ -152,6 +166,8 @@ then the next safe action is to inspect the update command first:
 That prints the exact server-side update command and records a local job entry.
 
 The update flow now requires Git identity to be configured for the operator user before it will run.
+
+### Step 2: Execute The Update
 
 When you are ready to run the update on the server itself, use:
 
@@ -162,6 +178,8 @@ When you are ready to run the update on the server itself, use:
 This can be run from the `threeplug` operator shell after the CLI is installed and on `PATH`.
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
+
+### Step 3: Use The Direct Script Path If Needed
 
 Use the update script directly if you prefer the shell-script path on a server that already has the `threeplug` operator user and workspace:
 
@@ -174,11 +192,17 @@ This refreshes the installed `3plug` CLI in the operator user's virtual environm
 
 ## Uninstall From a Server
 
+Use this order.
+
+### Step 1: Inspect The Uninstall Command
+
 To inspect the uninstall command from the CLI first, run:
 
 ```bash
 3plug server uninstall --remove-user
 ```
+
+### Step 2: Run The Uninstall From An Admin Shell
 
 When you are ready to actually run the uninstall on the server, use:
 
@@ -199,6 +223,8 @@ cd /opt/3plug-pro
 export PATH="/home/threeplug/.local/share/3plug-pro/venv/bin:$PATH"
 3plug server uninstall --remove-user --execute
 ```
+
+### Step 3: Use The Direct Script Path If Needed
 
 If you prefer to avoid relying on the `3plug` entrypoint after switching users, run the script directly:
 
