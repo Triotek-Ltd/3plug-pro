@@ -69,6 +69,28 @@ When `--production-tools` is used, the installer checks for `apache2` and stops/
 
 ### Step 6: Install Bench
 
+For private Bench sources, use SSH as the default access model for the `threeplug` operator user.
+
+Create and add the SSH key if needed:
+
+```bash
+ls -la ~/.ssh
+ssh-keygen -t ed25519 -C "threeplug@$(hostname)"
+cat ~/.ssh/id_ed25519.pub
+```
+
+Then add that public key in GitHub under:
+
+1. `Settings`
+2. `SSH and GPG keys`
+3. `New SSH key`
+
+Test the connection:
+
+```bash
+ssh -T git@github.com
+```
+
 After dependency installation, install Bench:
 
 ```bash
@@ -76,6 +98,10 @@ After dependency installation, install Bench:
 3plug install bench --execute
 bench --version
 ```
+
+The default Bench source now uses the SSH repo URL for the private `triotek-bench` repository and follows the repo default branch unless you override `--bench-source`.
+
+The Bench install script checks GitHub SSH access for the `threeplug` user before attempting the install.
 
 This is the current stopping point before future `3plug bench create`, `3plug bench register`, and `3plug bench status` work.
 

@@ -20,8 +20,8 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     install_bench.add_argument("--user", default="threeplug", help="Operator user name.")
     install_bench.add_argument(
         "--bench-source",
-        default="git+https://github.com/Triotek-Ltd/triotek-bench.git@main",
-        help="Bench package source to install.",
+        default="git+ssh://git@github.com/Triotek-Ltd/triotek-bench.git",
+        help="Bench package source to install. SSH is the default for private Triotek bench sources, and the repo default branch is used unless you override it.",
     )
     install_bench.set_defaults(handler=run_install_bench)
 

@@ -12,6 +12,23 @@ Current build position:
 * Phase 2: started for local SQLite state and job recording
 * Later bench/site lifecycle phases: not started
 
+Current confirmed server checkpoint:
+
+* `3plug --help`
+* `3plug init`
+* `3plug server preflight`
+* `3plug install server-dependencies`
+
+This checkpoint has been validated on a real Ubuntu host, including successful follow-up preflight results for:
+
+* `uv`
+* Node.js / npm / yarn
+* Redis
+* MariaDB / mysql client
+* wkhtmltopdf
+* nginx
+* supervisord
+
 ## Phase 0: Repo Cleanup and Build Foundation
 
 Status: complete except commit decision
@@ -85,7 +102,7 @@ Target:
 * install from the latest published release, or pin a stable tag explicitly
 * run `3plug init`
 * run `3plug server preflight`
-* run and validate real Linux `install server-dependencies`
+* done on a real Ubuntu server: run and validate real Linux `install server-dependencies`
 * run and validate real Linux `install bench`
 * implement and test real Linux `bench create`
 

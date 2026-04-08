@@ -158,6 +158,30 @@ This step is now implemented as a script-backed install flow for Ubuntu/Debian s
 
 ### Step 7: Install Bench
 
+For private Bench sources, use SSH as the default access model for the `threeplug` operator user.
+
+If the `threeplug` user does not already have a GitHub SSH key, create one:
+
+```bash
+ls -la ~/.ssh
+ssh-keygen -t ed25519 -C "threeplug@$(hostname)"
+cat ~/.ssh/id_ed25519.pub
+```
+
+Then add the public key in GitHub:
+
+1. open GitHub
+2. go to `Settings`
+3. go to `SSH and GPG keys`
+4. choose `New SSH key`
+5. paste the public key from `~/.ssh/id_ed25519.pub`
+
+Test the connection:
+
+```bash
+ssh -T git@github.com
+```
+
 Once the dependency preflight looks acceptable, install Bench:
 
 ```bash
@@ -165,6 +189,10 @@ Once the dependency preflight looks acceptable, install Bench:
 3plug install bench --execute
 bench --version
 ```
+
+The default Bench source now uses the SSH repo URL for the private `triotek-bench` repository and follows the repo default branch unless you override `--bench-source`.
+
+The Bench install script now checks GitHub SSH access for the `threeplug` user before attempting the install.
 
 This step is now implemented as a script-backed Bench install flow. The next major 3plug milestone after this is making `bench create`, `bench register`, and `bench status` real.
 
@@ -331,6 +359,15 @@ The foundation CLI is available and supports:
 * `3plug job show <job-id>`
 
 `3plug doctor` is currently a developer workspace check for this repository layout. Use `3plug server preflight` on pip-installed servers.
+
+Current server-confirmed operator path:
+
+* `3plug --help`
+* `3plug init`
+* `3plug server preflight`
+* `3plug install server-dependencies`
+
+This path has been validated on a real Ubuntu server through dependency installation and follow-up preflight checks, including `uv`, Node, Redis, MariaDB, wkhtmltopdf, Nginx, and Supervisor visibility.
 
 The next implementation phase will make these Bench lifecycle commands operational:
 

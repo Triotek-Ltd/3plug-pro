@@ -387,6 +387,38 @@ The `3plug` CLI should own the platform work after that:
 * `3plug bench create production`
 * site and app lifecycle commands
 
+## Private Bench Repo Access
+
+For the private `triotek-bench` repository, use SSH as the default access model for the `threeplug` operator user.
+
+Recommended operator steps:
+
+```bash
+ls -la ~/.ssh
+ssh-keygen -t ed25519 -C "threeplug@$(hostname)"
+cat ~/.ssh/id_ed25519.pub
+```
+
+Then add the public key in GitHub:
+
+1. open GitHub
+2. go to `Settings`
+3. go to `SSH and GPG keys`
+4. choose `New SSH key`
+5. paste the output of `~/.ssh/id_ed25519.pub`
+
+Test the SSH connection:
+
+```bash
+ssh -T git@github.com
+```
+
+The default Bench install source now uses the SSH repo URL and follows the repo default branch:
+
+```text
+git+ssh://git@github.com/Triotek-Ltd/triotek-bench.git
+```
+
 ## Current Implementation Status
 
 Currently implemented:

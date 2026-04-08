@@ -151,6 +151,7 @@ def run_install_bench(args: argparse.Namespace) -> int:
         "local_execute_command": command,
         "requires_explicit_execution": True,
         "requires_git_identity": True,
+        "requires_github_ssh_for_private_source": args.bench_source.startswith("git+ssh://"),
     }
     job_id = _record_install_job(
         root,

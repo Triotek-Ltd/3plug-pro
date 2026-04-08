@@ -199,6 +199,7 @@ class CliSmokeTests(unittest.TestCase):
         self.assertTrue(payload["script_exists"])
         self.assertEqual(payload["env"]["THREEPLUG_USER"], "ops")
         self.assertTrue(payload["requires_git_identity"])
+        self.assertTrue(payload["requires_github_ssh_for_private_source"])
 
     def test_init_uses_config_and_data_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
