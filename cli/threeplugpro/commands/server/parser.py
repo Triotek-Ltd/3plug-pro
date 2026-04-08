@@ -38,11 +38,6 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         help="Server workspace path managed by 3plug.",
     )
     server_bootstrap.add_argument(
-        "--set-password",
-        action="store_true",
-        help="Prompt interactively for the operator password during bootstrap.",
-    )
-    server_bootstrap.add_argument(
         "--no-firewall-enable",
         action="store_true",
         help="Skip automatic UFW enablement in the bootstrap script.",

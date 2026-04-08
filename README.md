@@ -56,17 +56,11 @@ This script performs the pre-CLI server setup:
 
 * installs minimal tools needed before `3plug` can run: Python, pip, venv, Git, curl, sudo, and UFW
 * creates the `threeplug` operator user if it does not already exist
-* optionally prompts for the operator password when `THREEPLUG_SET_PASSWORD=1`
+* requires an interactive password to be set for the operator user during bootstrap
 * adds `threeplug` to the sudo group
 * creates `/opt/3plug-pro`
 * gives `threeplug` ownership of `/opt/3plug-pro`
 * allows SSH in UFW before enabling the firewall
-
-If you want bootstrap to prompt for the operator password, run:
-
-```bash
-sudo THREEPLUG_SET_PASSWORD=1 bash /tmp/bootstrap_3plug_server.sh
-```
 
 If the server uses a custom SSH firewall profile, read `design/server-bootstrap-guide.md` before enabling the firewall.
 

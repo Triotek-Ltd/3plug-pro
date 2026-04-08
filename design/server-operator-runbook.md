@@ -10,28 +10,36 @@ Use it when:
 
 ## New Server
 
-Step 1: Run bootstrap as `root` or another sudo-capable admin user:
+### Step 1: Run Bootstrap
+
+Run as `root` or another sudo-capable admin user:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh
-sudo THREEPLUG_SET_PASSWORD=1 bash /tmp/bootstrap_3plug_server.sh
+sudo bash /tmp/bootstrap_3plug_server.sh
 ```
 
-Step 2: Configure Git identity for the operator user before any install or update action:
+### Step 2: Configure Git Identity
+
+Configure Git identity for the operator user before any install or update action:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh
 sudo bash /tmp/configure_3plug_git.sh
 ```
 
-Step 3: Install the CLI through the gated install script:
+### Step 3: Install The CLI
+
+Install the CLI through the gated install script:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh
 sudo bash /tmp/install_3plug_cli.sh
 ```
 
-Step 4: Switch to the operator shell and run the first checks:
+### Step 4: Run The First Checks
+
+Switch to the operator shell and run the first checks:
 
 ```bash
 su - threeplug
@@ -44,20 +52,22 @@ export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 
 ## Existing Server Update
 
-Step 1: Inspect first:
+### Step 1: Inspect First
 
 ```bash
 3plug server update
 3plug job list
 ```
 
-Step 2: Run when ready:
+### Step 2: Run The Update
 
 ```bash
 3plug server update --execute
 ```
 
-Step 3: If the CLI is not on `PATH`, use:
+### Step 3: Fix PATH If Needed
+
+If the CLI is not on `PATH`, use:
 
 ```bash
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
@@ -65,14 +75,16 @@ export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 
 ## Existing Server Uninstall
 
-Step 1: Inspect first:
+### Step 1: Inspect First
 
 ```bash
 3plug server uninstall --remove-user
 3plug job list
 ```
 
-Step 2: If removing the operator user, exit the `threeplug` shell and switch to `root` or another sudo-capable admin user before running the uninstall.
+### Step 2: Switch To An Admin Shell
+
+If removing the operator user, exit the `threeplug` shell and switch to `root` or another sudo-capable admin user before running the uninstall.
 
 Safe sequence:
 
@@ -83,7 +95,9 @@ export PATH="/home/threeplug/.local/share/3plug-pro/venv/bin:$PATH"
 3plug server uninstall --remove-user --execute
 ```
 
-Step 3: If you want the direct script path instead:
+### Step 3: Use The Direct Script Path If Needed
+
+If you want the direct script path instead:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/uninstall_3plug_server.sh -o /tmp/uninstall_3plug_server.sh
@@ -92,14 +106,18 @@ sudo env THREEPLUG_USER="threeplug" THREEPLUG_WORKDIR="/opt/3plug-pro" REMOVE_US
 
 ## Git Identity Rule
 
-Step 1: Do not run the first install or update flow before Git identity is configured for the operator user.
+### Step 1: Require Git Identity
+
+Do not run the first install or update flow before Git identity is configured for the operator user.
 
 Required values:
 
 * `git config --global user.name`
 * `git config --global user.email`
 
-Step 2: The supported setup action is:
+### Step 2: Run Git Setup
+
+The supported setup action is:
 
 ```bash
 3plug server git-setup

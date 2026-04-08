@@ -6,7 +6,6 @@ THREEPLUG_WORKDIR="${THREEPLUG_WORKDIR:-/opt/3plug-pro}"
 THREEPLUG_HOME="${THREEPLUG_HOME:-/home/${THREEPLUG_USER}}"
 FIREWALL_AUTO_ENABLE="${FIREWALL_AUTO_ENABLE:-1}"
 SSH_UFW_PROFILE="${SSH_UFW_PROFILE:-OpenSSH}"
-THREEPLUG_SET_PASSWORD="${THREEPLUG_SET_PASSWORD:-0}"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "Run this script as root or with sudo." >&2
@@ -48,12 +47,8 @@ else
   echo "Operator user already exists: ${THREEPLUG_USER}"
 fi
 
-if [ "${THREEPLUG_SET_PASSWORD}" = "1" ]; then
-  echo "Set a password for ${THREEPLUG_USER}."
-  passwd "${THREEPLUG_USER}"
-else
-  echo "Skipping password setup because THREEPLUG_SET_PASSWORD=${THREEPLUG_SET_PASSWORD}."
-fi
+echo "Set a password for ${THREEPLUG_USER}."
+passwd "${THREEPLUG_USER}"
 
 echo "Granting sudo access to ${THREEPLUG_USER}."
 usermod -aG sudo "${THREEPLUG_USER}"

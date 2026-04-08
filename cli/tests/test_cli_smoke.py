@@ -111,7 +111,6 @@ class CliSmokeTests(unittest.TestCase):
             "json",
             "server",
             "bootstrap",
-            "--set-password",
             "--no-firewall-enable",
             "--user",
             "ops",
@@ -120,8 +119,8 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         payload = json.loads(stdout)
         self.assertEqual(payload["operator_user"], "ops")
-        self.assertEqual(payload["env"]["THREEPLUG_SET_PASSWORD"], "1")
         self.assertEqual(payload["env"]["FIREWALL_AUTO_ENABLE"], "0")
+        self.assertTrue(payload["requires_interactive_password_prompt"])
 
     def test_json_server_git_setup_smoke(self) -> None:
         code, stdout, stderr = self.run_cli(

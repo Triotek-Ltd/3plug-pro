@@ -58,7 +58,7 @@ What this does:
 
 * installs only the minimal host tools needed before `3plug` can run
 * creates the `threeplug` operator user if it does not already exist
-* can prompt interactively for the operator password when `THREEPLUG_SET_PASSWORD=1`
+* requires an interactive password to be set for the operator user during bootstrap
 * grants the operator user sudo access
 * creates `/opt/3plug-pro`
 * gives the operator user ownership of `/opt/3plug-pro`
@@ -71,13 +71,7 @@ If the server uses a custom UFW SSH profile, run:
 sudo SSH_UFW_PROFILE=<profile-name> bash /tmp/bootstrap_3plug_server.sh
 ```
 
-If you want bootstrap to prompt for the operator password during the setup flow, run:
-
-```bash
-sudo THREEPLUG_SET_PASSWORD=1 bash /tmp/bootstrap_3plug_server.sh
-```
-
-If you skipped that flag and still need direct SSH login or password-based sudo, set a password after the bootstrap step:
+If you still need to change the password after bootstrap, use:
 
 ```bash
 sudo passwd threeplug

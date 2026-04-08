@@ -97,7 +97,6 @@ def run_server_bootstrap(args: argparse.Namespace) -> int:
         "THREEPLUG_WORKDIR": args.workdir,
         "SSH_UFW_PROFILE": args.ssh_ufw_profile,
         "FIREWALL_AUTO_ENABLE": "0" if args.no_firewall_enable else "1",
-        "THREEPLUG_SET_PASSWORD": "1" if args.set_password else "0",
     }
     command = _render_script_command(root / "scripts" / "linux" / "bootstrap_3plug_server.sh", env_vars)
     payload = _server_script_payload(
@@ -107,8 +106,7 @@ def run_server_bootstrap(args: argparse.Namespace) -> int:
         {
             "workspace": args.workdir,
             "operator_user": args.user,
-            "supports_interactive_password_prompt": True,
-            "password_prompt_env": "THREEPLUG_SET_PASSWORD=1",
+            "requires_interactive_password_prompt": True,
             "execute": args.execute,
             "env": env_vars,
             "fetch_command": "curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/bootstrap_3plug_server.sh -o /tmp/bootstrap_3plug_server.sh",
