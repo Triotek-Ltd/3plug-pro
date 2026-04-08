@@ -105,6 +105,21 @@ def ensure_state_db(root: Path, args: argparse.Namespace) -> Path:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS benches (
+                name TEXT PRIMARY KEY,
+                path TEXT NOT NULL,
+                status TEXT NOT NULL,
+                frappe_path TEXT NOT NULL,
+                frappe_branch TEXT NOT NULL,
+                bench_source TEXT NOT NULL,
+                python_executable TEXT,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
         conn.commit()
     finally:
         conn.close()
@@ -268,6 +283,84 @@ def get_job(root: Path, args: argparse.Namespace, job_id: str) -> dict[str, Any]
             for audit_row in audit_rows
         ],
     }
+
+
+def upsert_bench(
+    root: Path,
+    args: argparse.Namespace,
+    *,
+    name: str,
+    path: Path,
+    status: str,
+    frappe_path: str,
+    frappe_branch: str,
+    bench_source: str,
+    python_executable: str | None,
+) -> None:
+    db_path = ensure_state_db(root, args)
+    now = utc_now()
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute(
+            """
+            INSERT INTO benches (
+                name, path, status, frappe_path, frappe_branch, bench_source, python_executable, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(name) DO UPDATE SET
+                path = excluded.path,
+                status = excluded.status,
+                frappe_path = excluded.frappe_path,
+                frappe_branch = excluded.frappe_branch,
+                bench_source = excluded.bench_source,
+                python_executable = excluded.python_executable,
+                updated_at = excluded.updated_at
+            """,
+            (
+                name,
+                str(path),
+                status,
+                frappe_path,
+                frappe_branch,
+                bench_source,
+                python_executable,
+                now,
+                now,
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def list_bench_records(root: Path, args: argparse.Namespace) -> list[dict[str, Any]]:
+    db_path = ensure_state_db(root, args)
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            """
+            SELECT name, path, status, frappe_path, frappe_branch, bench_source, python_executable, created_at, updated_at
+            FROM benches
+            ORDER BY name ASC
+            """
+        ).fetchall()
+    finally:
+        conn.close()
+    return [
+        {
+            "name": row["name"],
+            "path": row["path"],
+            "status": row["status"],
+            "frappe_path": row["frappe_path"],
+            "frappe_branch": row["frappe_branch"],
+            "bench_source": row["bench_source"],
+            "python_executable": row["python_executable"],
+            "created_at": row["created_at"],
+            "updated_at": row["updated_at"],
+        }
+        for row in rows
+    ]
 
 
 def output_json(args: argparse.Namespace, payload: Any) -> bool:

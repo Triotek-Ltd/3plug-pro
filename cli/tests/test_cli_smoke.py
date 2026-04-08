@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import contextlib
 import io
 import json
@@ -18,6 +19,7 @@ if str(CLI_ROOT) not in sys.path:
 
 from threeplugpro.cli import main  # noqa: E402
 from threeplugpro.commands.server.handlers import _run_first_available  # noqa: E402
+from threeplugpro.core import upsert_bench  # noqa: E402
 
 
 class CliSmokeTests(unittest.TestCase):
@@ -200,6 +202,47 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(payload["env"]["THREEPLUG_USER"], "ops")
         self.assertTrue(payload["requires_git_identity"])
         self.assertTrue(payload["requires_github_ssh_for_private_source"])
+
+    def test_json_bench_create_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "bench", "create", "production")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "create")
+        self.assertEqual(payload["bench_name"], "production")
+        self.assertTrue(payload["script_exists"])
+        self.assertTrue(payload["path_is_within_approved_root"])
+        self.assertTrue(payload["requires_bench_install"])
+
+    def test_bench_list_reads_recorded_benches(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                init_code = main(["--root", str(root), "--format", "json", "init"])
+            self.assertEqual(init_code, 0, stderr.getvalue())
+
+            upsert_bench(
+                root,
+                argparse.Namespace(config_path=None, data_dir=None),
+                name="production",
+                path=root / "benches" / "production",
+                status="created",
+                frappe_path="https://github.com/Triotek-Ltd/triotek-frappe.git",
+                frappe_branch="main",
+                bench_source="triotek-bench",
+                python_executable=None,
+            )
+
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                code = main(["--root", str(root), "--format", "json", "bench", "list"])
+
+            self.assertEqual(code, 0, stderr.getvalue())
+            payload = json.loads(stdout.getvalue())
+            self.assertEqual(payload["benches"][0]["name"], "production")
 
     def test_init_uses_config_and_data_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

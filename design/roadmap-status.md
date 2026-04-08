@@ -18,6 +18,7 @@ Current confirmed server checkpoint:
 * `3plug init`
 * `3plug server preflight`
 * `3plug install server-dependencies`
+* `3plug install bench`
 
 This checkpoint has been validated on a real Ubuntu host, including successful follow-up preflight results for:
 
@@ -28,6 +29,7 @@ This checkpoint has been validated on a real Ubuntu host, including successful f
 * wkhtmltopdf
 * nginx
 * supervisord
+* Bench install (`bench --version` -> `5.0.0-dev`)
 
 ## Phase 0: Repo Cleanup and Build Foundation
 
@@ -103,7 +105,7 @@ Target:
 * run `3plug init`
 * run `3plug server preflight`
 * done on a real Ubuntu server: run and validate real Linux `install server-dependencies`
-* run and validate real Linux `install bench`
+* done on a real Ubuntu server: run and validate real Linux `install bench`
 * implement and test real Linux `bench create`
 
 Important:

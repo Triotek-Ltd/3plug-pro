@@ -372,8 +372,9 @@ Current server-confirmed operator path:
 * `3plug init`
 * `3plug server preflight`
 * `3plug install server-dependencies`
+* `3plug install bench`
 
-This path has been validated on a real Ubuntu server through dependency installation and follow-up preflight checks, including `uv`, Node, Redis, MariaDB, wkhtmltopdf, Nginx, and Supervisor visibility.
+This path has been validated on a real Ubuntu server through dependency installation, Bench installation (`bench --version` -> `5.0.0-dev`), and follow-up preflight checks, including `uv`, Node, Redis, MariaDB, wkhtmltopdf, Nginx, and Supervisor visibility.
 
 The next implementation phase will make these Bench lifecycle commands operational:
 
