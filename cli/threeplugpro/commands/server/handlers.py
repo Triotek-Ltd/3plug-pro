@@ -90,6 +90,14 @@ def _record_server_job(
     )
 
 
+def _run_first_available(commands: list[list[str]]) -> tuple[int, str, list[str]]:
+    for command in commands:
+        code, output = run_command(command)
+        if code != 127:
+            return code, output, command
+    return 127, "", commands[0]
+
+
 def run_server_bootstrap(args: argparse.Namespace) -> int:
     root = resolve_root(args)
     env_vars = {
@@ -377,20 +385,20 @@ def run_server_uninstall(args: argparse.Namespace) -> int:
 def run_server_preflight(args: argparse.Namespace) -> int:
     root = resolve_root(args)
     checks = [
-        ("os", ["cmd", "/c", "ver"] if platform.system() == "Windows" else ["uname", "-a"]),
-        ("git", ["git", "--version"]),
-        ("python", ["python", "--version"]),
-        ("uv", ["uv", "--version"]),
-        ("pip", ["pip", "--version"]),
-        ("node", ["node", "--version"]),
-        ("npm", ["npm", "--version"]),
-        ("yarn", ["yarn", "--version"]),
-        ("redis", ["redis-server", "--version"]),
-        ("mariadb", ["mariadb", "--version"]),
-        ("mysql", ["mysql", "--version"]),
-        ("wkhtmltopdf", ["wkhtmltopdf", "--version"]),
-        ("nginx", ["nginx", "-v"]),
-        ("supervisord", ["supervisord", "--version"]),
+        ("os", [["cmd", "/c", "ver"]] if platform.system() == "Windows" else [["uname", "-a"]]),
+        ("git", [["git", "--version"]]),
+        ("python", [["python", "--version"], ["python3", "--version"]]),
+        ("uv", [["uv", "--version"]]),
+        ("pip", [["pip", "--version"], ["pip3", "--version"]]),
+        ("node", [["node", "--version"], ["nodejs", "--version"]]),
+        ("npm", [["npm", "--version"]]),
+        ("yarn", [["yarn", "--version"]]),
+        ("redis", [["redis-server", "--version"], ["redis-cli", "--version"]]),
+        ("mariadb", [["mariadb", "--version"], ["mariadb-admin", "--version"]]),
+        ("mysql", [["mysql", "--version"]]),
+        ("wkhtmltopdf", [["wkhtmltopdf", "--version"]]),
+        ("nginx", [["nginx", "-v"]]),
+        ("supervisord", [["supervisord", "--version"], ["supervisorctl", "--version"], ["systemctl", "--version"]]),
     ]
 
     payload: dict[str, object] = {
@@ -416,8 +424,8 @@ def run_server_preflight(args: argparse.Namespace) -> int:
     print("upstream tracking branch upstream-v16")
 
     missing = 0
-    for label, command in checks:
-        code, output = run_command(command)
+    for label, commands in checks:
+        code, output, used_command = _run_first_available(commands)
         check_status = "missing"
         if code == 127:
             missing += 1
@@ -432,7 +440,8 @@ def run_server_preflight(args: argparse.Namespace) -> int:
         payload["checks"].append(
             {
                 "label": label,
-                "command": command,
+                "command": used_command,
+                "candidates": commands,
                 "status": check_status,
                 "output": output,
             }

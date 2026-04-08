@@ -7,6 +7,7 @@ import sys
 import tempfile
 import tomllib
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -16,6 +17,7 @@ if str(CLI_ROOT) not in sys.path:
     sys.path.insert(0, str(CLI_ROOT))
 
 from threeplugpro.cli import main  # noqa: E402
+from threeplugpro.commands.server.handlers import _run_first_available  # noqa: E402
 
 
 class CliSmokeTests(unittest.TestCase):
@@ -226,6 +228,23 @@ class CliSmokeTests(unittest.TestCase):
             self.assertEqual(show_payload["id"], payload["job_id"])
             self.assertEqual(show_payload["action"], "update")
             self.assertTrue(len(show_payload["audit_events"]) >= 1)
+
+    def test_preflight_command_fallback_uses_python3_when_python_missing(self) -> None:
+        def fake_run_command(command: list[str]) -> tuple[int, str]:
+            if command == ["python", "--version"]:
+                return 127, ""
+            if command == ["python3", "--version"]:
+                return 0, "Python 3.12.3"
+            return 127, ""
+
+        with mock.patch("threeplugpro.commands.server.handlers.run_command", side_effect=fake_run_command):
+            code, output, used_command = _run_first_available(
+                [["python", "--version"], ["python3", "--version"]]
+            )
+
+        self.assertEqual(code, 0)
+        self.assertEqual(output, "Python 3.12.3")
+        self.assertEqual(used_command, ["python3", "--version"])
 
 
 if __name__ == "__main__":
