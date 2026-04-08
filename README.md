@@ -303,5 +303,6 @@ Start with:
 * `design/linux-vm-target-plan.md`
 * `design/server-bootstrap-guide.md`
 * `design/server-operator-runbook.md`
+* `PUBLISHING.md`
 
 The first production-like target is an actual Linux server or local Linux VM. The next milestone is to run `3plug server preflight` there and use the results to implement the real server dependency and Bench install handlers.

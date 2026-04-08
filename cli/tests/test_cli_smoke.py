@@ -164,6 +164,25 @@ class CliSmokeTests(unittest.TestCase):
         self.assertTrue(payload["requires_git_identity"])
         self.assertIn("THREEPLUG_PACKAGE_URL", payload["env"])
 
+    def test_json_install_server_dependencies_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "install", "server-dependencies")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "server-dependencies")
+        self.assertTrue(payload["script_exists"])
+        self.assertTrue(payload["requires_explicit_execution"])
+
+    def test_json_install_bench_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli("--format", "json", "install", "bench", "--user", "ops")
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "bench")
+        self.assertTrue(payload["script_exists"])
+        self.assertEqual(payload["env"]["THREEPLUG_USER"], "ops")
+        self.assertTrue(payload["requires_git_identity"])
+
     def test_init_uses_config_and_data_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
