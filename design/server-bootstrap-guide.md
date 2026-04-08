@@ -264,6 +264,8 @@ This can be run from the `threeplug` operator shell after the CLI is installed. 
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
+If `--execute` reports that the script must be run as root or with sudo, use the printed `Run:` command directly instead. For the current pre-release path, that direct `sudo ... bash /tmp/...` execution is the safest option for privileged actions from an operator shell.
+
 Update first when you want the server to pick up the newest CLI behavior or the newest shell-backed install fixes before continuing to the next operator action.
 
 After update, the next confirmed operator target from the current server baseline is:
@@ -278,6 +280,16 @@ If you also want the current production-oriented extras:
 
 ```bash
 3plug install server-dependencies --production-tools --execute
+3plug server preflight
+```
+
+When `--production-tools` is used, the installer checks for `apache2` and stops/disables it before enabling Nginx so the default web-server ports are not contested.
+
+If `--execute` reports that the script must be run as root or with sudo, use the direct script path instead:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_server_dependencies.sh -o /tmp/install_server_dependencies.sh
+sudo env THREEPLUG_TARGET_STACK="frappe-v16" THREEPLUG_INSTALL_PRODUCTION_TOOLS="0" bash /tmp/install_server_dependencies.sh
 3plug server preflight
 ```
 

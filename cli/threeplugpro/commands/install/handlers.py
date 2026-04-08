@@ -81,6 +81,7 @@ def run_install_server_dependencies(args: argparse.Namespace) -> int:
         "local_execute_command": command,
         "requires_explicit_execution": True,
         "target_stack": "frappe-v16",
+        "production_conflicts_checked": ["apache2"],
         "installs": [
             "build-essential",
             "redis-server",
@@ -100,6 +101,7 @@ def run_install_server_dependencies(args: argparse.Namespace) -> int:
             "npm",
             "yarn",
         ],
+        "production_installs": ["nginx", "supervisor", "fail2ban"],
     }
     job_id = _record_install_job(
         root,

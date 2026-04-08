@@ -174,6 +174,7 @@ class CliSmokeTests(unittest.TestCase):
         self.assertTrue(payload["requires_explicit_execution"])
         self.assertIn("wkhtmltopdf", payload["installs"])
         self.assertIn("python3-venv", payload["installs"])
+        self.assertIn("apache2", payload["production_conflicts_checked"])
 
     def test_json_install_server_dependencies_with_production_tools_smoke(self) -> None:
         code, stdout, stderr = self.run_cli(
@@ -187,6 +188,7 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         payload = json.loads(stdout)
         self.assertEqual(payload["env"]["THREEPLUG_INSTALL_PRODUCTION_TOOLS"], "1")
+        self.assertIn("nginx", payload["production_installs"])
 
     def test_json_install_bench_smoke(self) -> None:
         code, stdout, stderr = self.run_cli("--format", "json", "install", "bench", "--user", "ops")

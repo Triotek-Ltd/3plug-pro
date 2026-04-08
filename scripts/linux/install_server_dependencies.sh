@@ -14,6 +14,18 @@ publish_global_binary() {
   fi
 }
 
+disable_apache_if_present() {
+  if ! command -v systemctl >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if systemctl list-unit-files apache2.service >/dev/null 2>&1; then
+    echo "Apache detected; stopping and disabling apache2 before enabling nginx"
+    systemctl stop apache2 || true
+    systemctl disable apache2 || true
+  fi
+}
+
 if [ "$(id -u)" -ne 0 ]; then
   echo "Run this script as root or with sudo." >&2
   exit 1
@@ -55,15 +67,22 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
   wkhtmltopdf
 
 if [ "${THREEPLUG_INSTALL_PRODUCTION_TOOLS}" = "1" ]; then
+  disable_apache_if_present
   DEBIAN_FRONTEND=noninteractive apt-get install -y \
     nginx \
     supervisor \
     fail2ban
+  if command -v systemctl >/dev/null 2>&1; then
+    systemctl enable nginx supervisor fail2ban || true
+    systemctl restart nginx || true
+    systemctl restart supervisor || true
+    systemctl restart fail2ban || true
+  fi
 fi
 
 if ! command -v uv >/dev/null 2>&1; then
   echo "Installing uv"
-  curl -LsSf https://astral.sh/uv/install.sh | sh
+  env UV_INSTALL_DIR="${THREEPLUG_GLOBAL_BIN_DIR}" sh -c "$(curl -LsSf https://astral.sh/uv/install.sh)"
 fi
 publish_global_binary "/root/.local/bin/uv" "uv"
 publish_global_binary "/root/.local/bin/uvx" "uvx"
@@ -89,6 +108,7 @@ Recommended verification:
 Notes:
 
   - This script installs the current 3plug dependency foundation for Ubuntu/Debian.
+  - When production tools are requested, apache2 is stopped and disabled before nginx is enabled.
   - wkhtmltopdf is installed from the distro package here; verify the exact version and patched-Qt status from preflight.
   - Verify exact versions from preflight before creating a Bench runtime.
 

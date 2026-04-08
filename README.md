@@ -152,6 +152,8 @@ Use `--production-tools` when you also want the current production-oriented extr
 3plug install server-dependencies --production-tools --execute
 ```
 
+When `--production-tools` is used, the installer now checks for `apache2` and stops/disables it before enabling Nginx so the default web-server ports are not contested.
+
 This step is now implemented as a script-backed install flow for Ubuntu/Debian servers.
 
 ### Step 7: Install Bench
@@ -204,6 +206,8 @@ This can be run from the `threeplug` operator shell after the CLI is installed. 
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
+If `--execute` is run from a normal operator shell and the script reports `Run this script as root or with sudo.`, use the printed `Run:` command directly instead. For pre-release operation, that direct `sudo ... bash /tmp/...` path is the safest execution path for privileged actions.
+
 Update first when you want the server to pick up the newest CLI command behavior or the newest shell-backed install fixes before continuing to the next operator step.
 
 ### Step 3: Install Server Dependencies
@@ -220,6 +224,14 @@ If you also want the current production-oriented extras such as Nginx and Superv
 
 ```bash
 3plug install server-dependencies --production-tools --execute
+3plug server preflight
+```
+
+If `--execute` reports that the script needs root or sudo, use the printed `Run:` command directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_server_dependencies.sh -o /tmp/install_server_dependencies.sh
+sudo env THREEPLUG_TARGET_STACK="frappe-v16" THREEPLUG_INSTALL_PRODUCTION_TOOLS="0" bash /tmp/install_server_dependencies.sh
 3plug server preflight
 ```
 
