@@ -50,6 +50,7 @@ The first Linux target commands should be:
 ```
 
 At this stage, `install server-dependencies` and `install bench` may still be plan-only until we implement the real Linux handlers.
+These commands are now implemented as script-backed Linux flows and should be validated on a real Linux target before moving on to bench creation.
 
 `3plug doctor` is currently a source workspace check. Use `3plug server preflight` as the first runtime check on a pip-installed Linux target.
 

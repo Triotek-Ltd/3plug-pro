@@ -136,6 +136,36 @@ What these commands do:
 
 Use the preflight output to confirm what the server already has and what still needs to be installed before Bench is provisioned.
 
+### Step 6: Install Server Dependencies
+
+After `3plug server preflight`, the next operator step is to install the missing server prerequisites for Frappe and Bench:
+
+```bash
+3plug install server-dependencies
+3plug install server-dependencies --execute
+3plug server preflight
+```
+
+Use `--production-tools` when you also want the current production-oriented extras such as Nginx and Supervisor:
+
+```bash
+3plug install server-dependencies --production-tools --execute
+```
+
+This step is now implemented as a script-backed install flow for Ubuntu/Debian servers.
+
+### Step 7: Install Bench
+
+Once the dependency preflight looks acceptable, install Bench:
+
+```bash
+3plug install bench
+3plug install bench --execute
+bench --version
+```
+
+This step is now implemented as a script-backed Bench install flow. The next major 3plug milestone after this is making `bench create`, `bench register`, and `bench status` real.
+
 For existing servers, custom firewall handling, or manual equivalent commands, see `design/server-bootstrap-guide.md`.
 
 ## Update Existing Server Install
@@ -260,6 +290,8 @@ The foundation CLI is available and supports:
 * `3plug server install-cli`
 * `3plug server update`
 * `3plug server uninstall`
+* `3plug install server-dependencies`
+* `3plug install bench`
 * `3plug app list`
 * `3plug app show <app>`
 * `3plug stack list`
@@ -269,13 +301,13 @@ The foundation CLI is available and supports:
 
 `3plug doctor` is currently a developer workspace check for this repository layout. Use `3plug server preflight` on pip-installed servers.
 
-The next implementation phase will make these server lifecycle commands operational:
+The next implementation phase will make these Bench lifecycle commands operational:
 
-* `3plug install server-dependencies`
-* `3plug install bench`
 * `3plug bench create production`
+* `3plug bench register`
+* `3plug bench status`
 
-Until that phase is complete, those lifecycle commands should be treated as planning/foundation commands rather than complete production installers. The bootstrap, update, and uninstall scripts remain the current shell-based server lifecycle helpers before those actions move behind the `3plug` control plane and UI.
+`3plug install server-dependencies` and `3plug install bench` are now implemented as script-backed Linux install flows. The bootstrap, update, and uninstall scripts remain the current shell-based server lifecycle helpers before those actions move behind the `3plug` control plane and UI.
 
 ## Source Policy
 

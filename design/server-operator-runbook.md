@@ -49,6 +49,34 @@ cd /opt/3plug-pro
 3plug server preflight
 ```
 
+### Step 5: Install Server Dependencies
+
+Use the preflight result to confirm what is missing, then install the server dependency foundation:
+
+```bash
+3plug install server-dependencies
+3plug install server-dependencies --execute
+3plug server preflight
+```
+
+If you also want the current production-oriented extras:
+
+```bash
+3plug install server-dependencies --production-tools --execute
+```
+
+### Step 6: Install Bench
+
+After dependency installation, install Bench:
+
+```bash
+3plug install bench
+3plug install bench --execute
+bench --version
+```
+
+This is the current stopping point before future `3plug bench create`, `3plug bench register`, and `3plug bench status` work.
+
 ## Existing Server Update
 
 ### Step 1: Inspect First

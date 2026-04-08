@@ -7,9 +7,10 @@ We are following `roadmap.md`.
 Current build position:
 
 * Phase 0: complete except commit decision
-* Phase 1: complete for the pre-server foundation; bench lifecycle commands still start next
+* Phase 1: complete for the server foundation and initial install flows
 * Linux VM target: planned next with WSL Ubuntu 24.04
-* Phase 2 and later: not started
+* Phase 2: started for local SQLite state and job recording
+* Later bench/site lifecycle phases: not started
 
 ## Phase 0: Repo Cleanup and Build Foundation
 
@@ -58,14 +59,21 @@ Remaining:
 
 ## Phase 2: Local State and Job Store
 
-Status: not started
+Status: started
 
-Next expected work:
+Completed so far:
 
-* create SQLite state layer
-* add tables for servers, environments, benches, sites, app sources, stacks, jobs, audit events, and backups
-* make `3plug init` initialize the local state database
-* make plan-only commands create dry-run job records
+* `3plug init` creates the local state database
+* server lifecycle commands create job records
+* install commands create job records
+* `3plug job list` reads recorded jobs
+* `3plug job show <job-id>` reads job details and audit events
+
+Remaining expected work:
+
+* expand SQLite state beyond the current job/audit baseline
+* add tables for servers, environments, benches, sites, app sources, stacks, and backups
+* record real bench and site lifecycle state as those commands become operational
 
 ## Linux VM Target
 
@@ -74,10 +82,12 @@ Status: prepared, but WSL distro installation is blocked from the current termin
 Target:
 
 * WSL Ubuntu 24.04
-* install from `git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli`
+* install from the latest published release, or pin a stable tag explicitly
 * run `3plug init`
 * run `3plug server preflight`
-* implement and test real Linux `install server-dependencies`, `install bench`, and `bench create`
+* run and validate real Linux `install server-dependencies`
+* run and validate real Linux `install bench`
+* implement and test real Linux `bench create`
 
 Important:
 
@@ -111,4 +121,4 @@ Expected current warning:
 * `bench` is not on PATH in the current Windows development shell
 * several Linux/server dependencies are missing in the current Windows development shell
 
-These are expected until Phase 4 and Phase 5 are implemented on the managed server target.
+These are expected until the bench lifecycle commands are implemented on the managed server target.
