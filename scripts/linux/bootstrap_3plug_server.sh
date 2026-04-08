@@ -82,16 +82,21 @@ Next commands:
 
   su - ${THREEPLUG_USER}
   cd ${THREEPLUG_WORKDIR}
-  python3 -m venv ~/.local/share/3plug-pro/venv
-  ~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
-  ~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
-  export PATH="\$HOME/.local/share/3plug-pro/venv/bin:\$PATH"
+  curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh
+  sudo bash /tmp/configure_3plug_git.sh
+  curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh
+  sudo bash /tmp/install_3plug_cli.sh
+  export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
   3plug --help
   3plug init
   3plug server preflight
 
 Maintenance commands:
 
+  curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh
+  sudo bash /tmp/configure_3plug_git.sh
+  curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh
+  sudo bash /tmp/install_3plug_cli.sh
   curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/update_3plug_server.sh -o /tmp/update_3plug_server.sh
   sudo bash /tmp/update_3plug_server.sh
   curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/uninstall_3plug_server.sh -o /tmp/uninstall_3plug_server.sh

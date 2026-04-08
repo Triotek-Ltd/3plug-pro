@@ -29,6 +29,8 @@ Current server commands include:
 ```text
 3plug server preflight
 3plug server bootstrap
+3plug server git-setup
+3plug server install-cli
 3plug server update
 3plug server uninstall
 3plug job list

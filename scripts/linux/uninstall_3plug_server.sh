@@ -15,6 +15,42 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+terminate_user_processes() {
+  local user="$1"
+  if ! id "${user}" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if command -v loginctl >/dev/null 2>&1; then
+    loginctl terminate-user "${user}" >/dev/null 2>&1 || true
+  fi
+
+  pkill -TERM -u "${user}" >/dev/null 2>&1 || true
+  sleep 2
+  if pgrep -u "${user}" >/dev/null 2>&1; then
+    pkill -KILL -u "${user}" >/dev/null 2>&1 || true
+    sleep 1
+  fi
+}
+
+remove_operator_user() {
+  local user="$1"
+
+  terminate_user_processes "${user}"
+
+  if command -v userdel >/dev/null 2>&1; then
+    userdel -r "${user}" && return 0
+    userdel -f "${user}" && return 0
+  fi
+
+  if command -v deluser >/dev/null 2>&1; then
+    deluser --remove-home "${user}" && return 0
+  fi
+
+  echo "Failed to remove operator user: ${user}" >&2
+  return 1
+}
+
 confirm() {
   local prompt="$1"
   if [ "${THREEPLUG_FORCE}" = "1" ]; then
@@ -59,7 +95,7 @@ fi
 if id "${THREEPLUG_USER}" >/dev/null 2>&1; then
   if [ "${REMOVE_USER}" = "1" ]; then
     echo "Removing operator user: ${THREEPLUG_USER}"
-    deluser --remove-home "${THREEPLUG_USER}"
+    remove_operator_user "${THREEPLUG_USER}"
   else
     echo "Keeping operator user: ${THREEPLUG_USER}"
     if id -nG "${THREEPLUG_USER}" | tr ' ' '\n' | grep -qx "sudo"; then

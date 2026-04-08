@@ -4,6 +4,8 @@ import argparse
 
 from threeplugpro.commands.server.handlers import (
     run_server_bootstrap,
+    run_server_git_setup,
+    run_server_install_cli,
     run_server_preflight,
     run_server_uninstall,
     run_server_update,
@@ -51,6 +53,37 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         help="UFW SSH profile to allow before firewall enablement.",
     )
     server_bootstrap.set_defaults(handler=run_server_bootstrap)
+
+    server_git_setup = server_sub.add_parser(
+        "git-setup",
+        help="Show or execute Git identity setup for the operator user before install/update flows.",
+    )
+    server_git_setup.add_argument(
+        "--execute",
+        action="store_true",
+        help="Execute the local Linux Git setup script instead of only printing guidance.",
+    )
+    server_git_setup.add_argument("--user", default="threeplug", help="Operator user name.")
+    server_git_setup.add_argument("--git-name", default="", help="Git user.name to configure.")
+    server_git_setup.add_argument("--git-email", default="", help="Git user.email to configure.")
+    server_git_setup.set_defaults(handler=run_server_git_setup)
+
+    server_install_cli = server_sub.add_parser(
+        "install-cli",
+        help="Show or execute the first 3plug CLI install flow after Git identity is configured.",
+    )
+    server_install_cli.add_argument(
+        "--execute",
+        action="store_true",
+        help="Execute the local Linux install script instead of only printing guidance.",
+    )
+    server_install_cli.add_argument("--user", default="threeplug", help="Operator user name.")
+    server_install_cli.add_argument(
+        "--package-url",
+        default="git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli",
+        help="Package URL used to install the 3plug CLI.",
+    )
+    server_install_cli.set_defaults(handler=run_server_install_cli)
 
     server_update = server_sub.add_parser(
         "update",

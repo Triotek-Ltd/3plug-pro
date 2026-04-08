@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import os
 import platform
+from pathlib import Path
 import subprocess
+import tempfile
 
 from threeplugpro.core import create_job, output_json, resolve_root, run_command, update_job
 
@@ -45,6 +47,28 @@ def _execute_server_script(script_path, env_vars: dict[str, str]) -> int:
         env={**os.environ, **command_env},
     )
     return completed.returncode
+
+
+def _execute_server_script_with_fetch(script_path: Path, env_vars: dict[str, str], fetch_command: str) -> int:
+    if script_path.exists():
+        return _execute_server_script(script_path, env_vars)
+
+    tmp_script = Path(tempfile.gettempdir()) / script_path.name
+    fetch_completed = subprocess.run(
+        [
+            "curl",
+            "-fsSL",
+            f"https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/{script_path.name}",
+            "-o",
+            str(tmp_script),
+        ],
+        check=False,
+        env=os.environ.copy(),
+    )
+    if fetch_completed.returncode != 0:
+        print(f"Failed to fetch script via: {fetch_command}")
+        return fetch_completed.returncode
+    return _execute_server_script(tmp_script, env_vars)
 
 
 def _record_server_job(
@@ -111,9 +135,120 @@ def run_server_bootstrap(args: argparse.Namespace) -> int:
     print(f"Run: {payload['run_command']}")
     print(f"Local execute command: {payload['local_execute_command']}")
     if args.execute:
-        print("Executing local bootstrap script.")
+        print("Executing bootstrap script.")
         update_job(root, args, job_id=job_id, status="running", details=payload)
-        code = _execute_server_script(payload["script_path"], env_vars)
+        code = _execute_server_script_with_fetch(payload["script_path"], env_vars, str(payload["fetch_command"]))
+        update_job(
+            root,
+            args,
+            job_id=job_id,
+            status="completed" if code == 0 else "failed",
+            details={**payload, "exit_code": code},
+        )
+        return code
+    return 0
+
+
+def run_server_git_setup(args: argparse.Namespace) -> int:
+    root = resolve_root(args)
+    env_vars = {
+        "THREEPLUG_USER": args.user,
+    }
+    if args.git_name:
+        env_vars["THREEPLUG_GIT_NAME"] = args.git_name
+    if args.git_email:
+        env_vars["THREEPLUG_GIT_EMAIL"] = args.git_email
+    command = _render_script_command(root / "scripts" / "linux" / "configure_3plug_git.sh", env_vars)
+    payload = _server_script_payload(
+        root,
+        "configure_3plug_git.sh",
+        "git-setup",
+        {
+            "operator_user": args.user,
+            "execute": args.execute,
+            "env": env_vars,
+            "fetch_command": "curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh",
+            "run_command": command.replace(str(root / "scripts" / "linux" / "configure_3plug_git.sh"), "/tmp/configure_3plug_git.sh"),
+            "local_execute_command": command,
+            "requires_git_identity": True,
+        },
+    )
+    job_id = _record_server_job(
+        root,
+        args,
+        action="git-setup",
+        summary="Configure Git identity for the operator user before install/update flows.",
+        payload=payload,
+    )
+    payload["job_id"] = job_id
+    if output_json(args, payload):
+        return 0
+
+    print("3plug server git-setup")
+    print(f"job {job_id}")
+    print(f"script {payload['script_path']}")
+    print("Use this to configure Git identity before installing or updating 3plug.")
+    print(f"Fetch: {payload['fetch_command']}")
+    print(f"Run: {payload['run_command']}")
+    print(f"Local execute command: {payload['local_execute_command']}")
+    if args.execute:
+        print("Executing git setup script.")
+        update_job(root, args, job_id=job_id, status="running", details=payload)
+        code = _execute_server_script_with_fetch(payload["script_path"], env_vars, str(payload["fetch_command"]))
+        update_job(
+            root,
+            args,
+            job_id=job_id,
+            status="completed" if code == 0 else "failed",
+            details={**payload, "exit_code": code},
+        )
+        return code
+    return 0
+
+
+def run_server_install_cli(args: argparse.Namespace) -> int:
+    root = resolve_root(args)
+    env_vars = {
+        "THREEPLUG_USER": args.user,
+        "THREEPLUG_PACKAGE_URL": args.package_url,
+    }
+    command = _render_script_command(root / "scripts" / "linux" / "install_3plug_cli.sh", env_vars)
+    payload = _server_script_payload(
+        root,
+        "install_3plug_cli.sh",
+        "install-cli",
+        {
+            "operator_user": args.user,
+            "execute": args.execute,
+            "env": env_vars,
+            "fetch_command": "curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh",
+            "run_command": command.replace(str(root / "scripts" / "linux" / "install_3plug_cli.sh"), "/tmp/install_3plug_cli.sh"),
+            "local_execute_command": command,
+            "requires_git_identity": True,
+        },
+    )
+    job_id = _record_server_job(
+        root,
+        args,
+        action="install-cli",
+        summary="Install the 3plug CLI after Git identity is configured.",
+        payload=payload,
+    )
+    payload["job_id"] = job_id
+    if output_json(args, payload):
+        return 0
+
+    print("3plug server install-cli")
+    print(f"job {job_id}")
+    print(f"script {payload['script_path']}")
+    print("Use this to install 3plug after Git identity is configured.")
+    print(f"Fetch: {payload['fetch_command']}")
+    print(f"Run: {payload['run_command']}")
+    print(f"Local execute command: {payload['local_execute_command']}")
+    if args.execute:
+        print("Executing CLI install script.")
+        update_job(root, args, job_id=job_id, status="running", details=payload)
+        code = _execute_server_script_with_fetch(payload["script_path"], env_vars, str(payload["fetch_command"]))
         update_job(
             root,
             args,
@@ -146,6 +281,7 @@ def run_server_update(args: argparse.Namespace) -> int:
             "run_command": command.replace(str(root / "scripts" / "linux" / "update_3plug_server.sh"), "/tmp/update_3plug_server.sh"),
             "local_execute_command": command,
             "preserves_workspace_state": True,
+            "requires_git_identity": True,
         },
     )
     job_id = _record_server_job(
@@ -167,9 +303,9 @@ def run_server_update(args: argparse.Namespace) -> int:
     print(f"Run: {payload['run_command']}")
     print(f"Local execute command: {payload['local_execute_command']}")
     if args.execute:
-        print("Executing local update script.")
+        print("Executing update script.")
         update_job(root, args, job_id=job_id, status="running", details=payload)
-        code = _execute_server_script(payload["script_path"], env_vars)
+        code = _execute_server_script_with_fetch(payload["script_path"], env_vars, str(payload["fetch_command"]))
         update_job(
             root,
             args,
@@ -226,9 +362,9 @@ def run_server_uninstall(args: argparse.Namespace) -> int:
     print(f"Run: {payload['run_command']}")
     print(f"Local execute command: {payload['local_execute_command']}")
     if args.execute:
-        print("Executing local uninstall script.")
+        print("Executing uninstall script.")
         update_job(root, args, job_id=job_id, status="running", details=payload)
-        code = _execute_server_script(payload["script_path"], env_vars)
+        code = _execute_server_script_with_fetch(payload["script_path"], env_vars, str(payload["fetch_command"]))
         update_job(
             root,
             args,

@@ -94,6 +94,7 @@ class CliSmokeTests(unittest.TestCase):
         self.assertTrue(payload["script_exists"])
         self.assertTrue(payload["preserves_workspace_state"])
         self.assertIn("THREEPLUG_PACKAGE_URL", payload["env"])
+        self.assertTrue(payload["requires_git_identity"])
 
     def test_json_server_uninstall_smoke(self) -> None:
         code, stdout, stderr = self.run_cli("--format", "json", "server", "uninstall")
@@ -121,6 +122,45 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(payload["operator_user"], "ops")
         self.assertEqual(payload["env"]["THREEPLUG_SET_PASSWORD"], "1")
         self.assertEqual(payload["env"]["FIREWALL_AUTO_ENABLE"], "0")
+
+    def test_json_server_git_setup_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli(
+            "--format",
+            "json",
+            "server",
+            "git-setup",
+            "--user",
+            "ops",
+            "--git-name",
+            "Ops User",
+            "--git-email",
+            "ops@example.com",
+        )
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "git-setup")
+        self.assertTrue(payload["script_exists"])
+        self.assertEqual(payload["operator_user"], "ops")
+        self.assertEqual(payload["env"]["THREEPLUG_GIT_NAME"], "Ops User")
+        self.assertEqual(payload["env"]["THREEPLUG_GIT_EMAIL"], "ops@example.com")
+
+    def test_json_server_install_cli_smoke(self) -> None:
+        code, stdout, stderr = self.run_cli(
+            "--format",
+            "json",
+            "server",
+            "install-cli",
+            "--user",
+            "ops",
+        )
+
+        self.assertEqual(code, 0, stderr)
+        payload = json.loads(stdout)
+        self.assertEqual(payload["action"], "install-cli")
+        self.assertTrue(payload["script_exists"])
+        self.assertEqual(payload["operator_user"], "ops")
+        self.assertTrue(payload["requires_git_identity"])
 
     def test_init_uses_config_and_data_overrides(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

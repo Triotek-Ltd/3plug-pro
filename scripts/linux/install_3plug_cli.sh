@@ -2,7 +2,6 @@
 set -euo pipefail
 
 THREEPLUG_USER="${THREEPLUG_USER:-threeplug}"
-THREEPLUG_WORKDIR="${THREEPLUG_WORKDIR:-/opt/3plug-pro}"
 THREEPLUG_HOME="${THREEPLUG_HOME:-/home/${THREEPLUG_USER}}"
 THREEPLUG_VENV="${THREEPLUG_VENV:-${THREEPLUG_HOME}/.local/share/3plug-pro/venv}"
 THREEPLUG_PACKAGE_URL="${THREEPLUG_PACKAGE_URL:-git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli}"
@@ -23,18 +22,14 @@ GIT_USER_EMAIL="$(sudo -H -u "${THREEPLUG_USER}" git config --global --get user.
 
 if [ -z "${GIT_USER_NAME}" ] || [ -z "${GIT_USER_EMAIL}" ]; then
   echo "Git identity is not configured for ${THREEPLUG_USER}." >&2
-  echo "Run the Git setup step before updating or installing 3plug." >&2
+  echo "Run the Git setup step before installing 3plug." >&2
   echo "Suggested command:" >&2
   echo "  curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh" >&2
   echo "  sudo bash /tmp/configure_3plug_git.sh" >&2
   exit 1
 fi
 
-echo "Ensuring workspace exists: ${THREEPLUG_WORKDIR}"
-mkdir -p "${THREEPLUG_WORKDIR}"
-chown -R "${THREEPLUG_USER}:${THREEPLUG_USER}" "${THREEPLUG_WORKDIR}"
-
-echo "Updating 3plug CLI for ${THREEPLUG_USER}"
+echo "Installing 3plug CLI for ${THREEPLUG_USER}"
 sudo -H -u "${THREEPLUG_USER}" bash -lc "
   set -euo pipefail
   mkdir -p \"$(dirname "${THREEPLUG_VENV}")\"
@@ -45,7 +40,7 @@ sudo -H -u "${THREEPLUG_USER}" bash -lc "
 
 cat <<EOF
 
-Update complete.
+Install complete.
 
 Recommended verification as ${THREEPLUG_USER}:
 
@@ -53,6 +48,7 @@ Recommended verification as ${THREEPLUG_USER}:
   git config --global --get user.email
   export PATH="${THREEPLUG_VENV}/bin:\$PATH"
   3plug --help
+  3plug init
   3plug server preflight
 
 EOF

@@ -77,24 +77,43 @@ cd /opt/3plug-pro
 
 This avoids running normal platform operations directly as `root`.
 
-Install the current 3plug-pro CLI from GitHub into a dedicated virtual environment:
+Before installing `3plug`, configure Git identity for the operator user. Do this before any `pip install` step or other 3plug lifecycle command:
 
 ```bash
-python3 -m venv ~/.local/share/3plug-pro/venv
-~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
-~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh
+sudo bash /tmp/configure_3plug_git.sh
+```
+
+Or inspect it first through the CLI once the updated command surface is available:
+
+```bash
+3plug server git-setup
+```
+
+This sets `git config --global user.name` and `git config --global user.email` for the operator user. The update/install flow should not proceed before this is configured.
+
+Then install the current 3plug-pro CLI from GitHub through the gated install script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh
+sudo bash /tmp/install_3plug_cli.sh
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
-If you are installing from a private fork or private mirror, use the same token for the pip install:
+If you are using the updated CLI surface already, you can inspect the same action first with:
 
 ```bash
-read -rsp "GitHub token: " GITHUB_TOKEN; echo
-~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://x-access-token:${GITHUB_TOKEN}@github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+3plug server install-cli
+```
+
+If you need a private fork or private mirror, pass a custom package URL into the script environment instead of bypassing the gate:
+
+```bash
+sudo THREEPLUG_PACKAGE_URL="git+https://x-access-token:${GITHUB_TOKEN}@github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli" bash /tmp/install_3plug_cli.sh
 unset GITHUB_TOKEN
 ```
 
-This uses a venv so the install does not modify the system Python environment.
+This uses a venv so the install does not modify the system Python environment, and it refuses to continue until Git identity is configured.
 
 Run the first CLI checks in this order:
 
@@ -132,11 +151,17 @@ then the next safe action is to inspect the update command first:
 
 That prints the exact server-side update command and records a local job entry.
 
+The update flow now requires Git identity to be configured for the operator user before it will run.
+
 When you are ready to run the update on the server itself, use:
 
 ```bash
 3plug server update --execute
 ```
+
+This can be run from the `threeplug` operator shell after the CLI is installed and on `PATH`.
+
+On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
 Use the update script directly if you prefer the shell-script path on a server that already has the `threeplug` operator user and workspace:
 
@@ -159,6 +184,27 @@ When you are ready to actually run the uninstall on the server, use:
 
 ```bash
 3plug server uninstall --remove-user --execute
+```
+
+If you are removing the `threeplug` user itself, do not run the uninstall from an active `threeplug` login shell. Exit that shell first, then run the uninstall as `root` or another sudo-capable admin user.
+
+On pip-installed servers, `--execute` will fetch the current uninstall script to the server temp directory if the local repo script is not present under the workspace path.
+
+Recommended safe sequence:
+
+```bash
+exit
+sudo -i
+cd /opt/3plug-pro
+export PATH="/home/threeplug/.local/share/3plug-pro/venv/bin:$PATH"
+3plug server uninstall --remove-user --execute
+```
+
+If you prefer to avoid relying on the `3plug` entrypoint after switching users, run the script directly:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/uninstall_3plug_server.sh -o /tmp/uninstall_3plug_server.sh
+sudo env THREEPLUG_USER="threeplug" THREEPLUG_WORKDIR="/opt/3plug-pro" REMOVE_USER="1" REMOVE_WORKDIR="1" REMOVE_VENV="1" THREEPLUG_FORCE="0" bash /tmp/uninstall_3plug_server.sh
 ```
 
 Use the uninstall script directly when retiring a server or removing the 3plug-managed footprint:
@@ -190,6 +236,8 @@ The foundation CLI is available and supports:
 * `3plug init`
 * `3plug server preflight`
 * `3plug server bootstrap`
+* `3plug server git-setup`
+* `3plug server install-cli`
 * `3plug server update`
 * `3plug server uninstall`
 * `3plug app list`
@@ -236,5 +284,6 @@ Start with:
 * `design/roadmap-status.md`
 * `design/linux-vm-target-plan.md`
 * `design/server-bootstrap-guide.md`
+* `design/server-operator-runbook.md`
 
 The first production-like target is an actual Linux server or local Linux VM. The next milestone is to run `3plug server preflight` there and use the results to implement the real server dependency and Bench install handlers.
