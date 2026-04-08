@@ -26,6 +26,38 @@ disable_apache_if_present() {
   fi
 }
 
+find_uv_binary() {
+  local candidate
+  for candidate in \
+    "${THREEPLUG_GLOBAL_BIN_DIR}/uv" \
+    "/root/.local/bin/uv" \
+    "/usr/local/bin/uv" \
+    "/usr/bin/uv"
+  do
+    if [ -x "${candidate}" ]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+find_uvx_binary() {
+  local candidate
+  for candidate in \
+    "${THREEPLUG_GLOBAL_BIN_DIR}/uvx" \
+    "/root/.local/bin/uvx" \
+    "/usr/local/bin/uvx" \
+    "/usr/bin/uvx"
+  do
+    if [ -x "${candidate}" ]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
 if [ "$(id -u)" -ne 0 ]; then
   echo "Run this script as root or with sudo." >&2
   exit 1
@@ -84,8 +116,22 @@ if ! command -v uv >/dev/null 2>&1; then
   echo "Installing uv"
   env UV_INSTALL_DIR="${THREEPLUG_GLOBAL_BIN_DIR}" sh -c "$(curl -LsSf https://astral.sh/uv/install.sh)"
 fi
-publish_global_binary "/root/.local/bin/uv" "uv"
-publish_global_binary "/root/.local/bin/uvx" "uvx"
+
+if uv_path="$(find_uv_binary)"; then
+  publish_global_binary "${uv_path}" "uv"
+else
+  echo "uv installation did not produce a usable uv binary." >&2
+  exit 1
+fi
+
+if uvx_path="$(find_uvx_binary)"; then
+  publish_global_binary "${uvx_path}" "uvx"
+fi
+
+if ! command -v uv >/dev/null 2>&1; then
+  echo "uv is still not available on PATH after installation." >&2
+  exit 1
+fi
 
 if ! command -v node >/dev/null 2>&1 && ! command -v nodejs >/dev/null 2>&1; then
   echo "Installing distro nodejs and npm"
