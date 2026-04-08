@@ -413,6 +413,12 @@ Test the SSH connection:
 ssh -T git@github.com
 ```
 
+Validate actual repo access as the `threeplug` user:
+
+```bash
+sudo -H -u threeplug git ls-remote --heads ssh://git@github.com/Triotek-Ltd/triotek-bench.git
+```
+
 The default Bench install source now uses the SSH repo URL and follows the repo default branch:
 
 ```text

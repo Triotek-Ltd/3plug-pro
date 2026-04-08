@@ -91,6 +91,12 @@ Test the connection:
 ssh -T git@github.com
 ```
 
+Validate actual repo access as the `threeplug` user:
+
+```bash
+sudo -H -u threeplug git ls-remote --heads ssh://git@github.com/Triotek-Ltd/triotek-bench.git
+```
+
 After dependency installation, install Bench:
 
 ```bash
@@ -101,7 +107,7 @@ bench --version
 
 The default Bench source now uses the SSH repo URL for the private `triotek-bench` repository and follows the repo default branch unless you override `--bench-source`.
 
-The Bench install script checks GitHub SSH access for the `threeplug` user before attempting the install.
+The Bench install script checks actual repo access for the `threeplug` user with `git ls-remote` before attempting the install.
 
 This is the current stopping point before future `3plug bench create`, `3plug bench register`, and `3plug bench status` work.
 

@@ -6,6 +6,7 @@ THREEPLUG_HOME="${THREEPLUG_HOME:-/home/${THREEPLUG_USER}}"
 THREEPLUG_VENV="${THREEPLUG_VENV:-${THREEPLUG_HOME}/.local/share/3plug-pro/venv}"
 THREEPLUG_BENCH_SOURCE="${THREEPLUG_BENCH_SOURCE:-git+ssh://git@github.com/Triotek-Ltd/triotek-bench.git}"
 THREEPLUG_GLOBAL_BIN_DIR="${THREEPLUG_GLOBAL_BIN_DIR:-/usr/local/bin}"
+THREEPLUG_BENCH_GIT_REMOTE="${THREEPLUG_BENCH_SOURCE#git+}"
 
 detect_existing_bench_version() {
   if [ -x "${THREEPLUG_VENV}/bin/bench" ]; then
@@ -36,9 +37,9 @@ fi
 if [[ "${THREEPLUG_BENCH_SOURCE}" == git+ssh://* ]] || [[ "${THREEPLUG_BENCH_SOURCE}" == git@github.com:* ]]; then
   echo "Using SSH-based Bench source"
   echo "Make sure the ${THREEPLUG_USER} user has a GitHub SSH key configured and tested."
-  sudo -H -u "${THREEPLUG_USER}" ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -T git@github.com >/dev/null 2>&1 || {
-    echo "SSH access to GitHub is not ready for ${THREEPLUG_USER}." >&2
-    echo "Test with: ssh -T git@github.com" >&2
+  sudo -H -u "${THREEPLUG_USER}" git ls-remote --heads "${THREEPLUG_BENCH_GIT_REMOTE}" >/dev/null 2>&1 || {
+    echo "Repo access is not ready for ${THREEPLUG_USER}." >&2
+    echo "Test with: sudo -H -u ${THREEPLUG_USER} git ls-remote --heads ${THREEPLUG_BENCH_GIT_REMOTE}" >&2
     exit 1
   }
 fi
