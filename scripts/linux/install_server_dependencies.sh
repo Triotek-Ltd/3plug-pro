@@ -8,10 +8,17 @@ THREEPLUG_GLOBAL_BIN_DIR="${THREEPLUG_GLOBAL_BIN_DIR:-/usr/local/bin}"
 publish_global_binary() {
   local source_path="$1"
   local target_name="$2"
-  if [ -x "${source_path}" ]; then
-    install -d "${THREEPLUG_GLOBAL_BIN_DIR}"
-    ln -sf "${source_path}" "${THREEPLUG_GLOBAL_BIN_DIR}/${target_name}"
+  local target_path="${THREEPLUG_GLOBAL_BIN_DIR}/${target_name}"
+  if [ ! -x "${source_path}" ]; then
+    return 0
   fi
+
+  install -d "${THREEPLUG_GLOBAL_BIN_DIR}"
+  if [ "${source_path}" = "${target_path}" ]; then
+    return 0
+  fi
+
+  ln -sf "${source_path}" "${target_path}"
 }
 
 disable_apache_if_present() {
@@ -117,6 +124,14 @@ if ! command -v uv >/dev/null 2>&1; then
   env UV_INSTALL_DIR="${THREEPLUG_GLOBAL_BIN_DIR}" sh -c "$(curl -LsSf https://astral.sh/uv/install.sh)"
 fi
 
+if [ -L "${THREEPLUG_GLOBAL_BIN_DIR}/uv" ] && [ "$(readlink "${THREEPLUG_GLOBAL_BIN_DIR}/uv")" = "${THREEPLUG_GLOBAL_BIN_DIR}/uv" ]; then
+  rm -f "${THREEPLUG_GLOBAL_BIN_DIR}/uv"
+fi
+
+if [ -L "${THREEPLUG_GLOBAL_BIN_DIR}/uvx" ] && [ "$(readlink "${THREEPLUG_GLOBAL_BIN_DIR}/uvx")" = "${THREEPLUG_GLOBAL_BIN_DIR}/uvx" ]; then
+  rm -f "${THREEPLUG_GLOBAL_BIN_DIR}/uvx"
+fi
+
 if uv_path="$(find_uv_binary)"; then
   publish_global_binary "${uv_path}" "uv"
 else
@@ -132,6 +147,11 @@ if ! command -v uv >/dev/null 2>&1; then
   echo "uv is still not available on PATH after installation." >&2
   exit 1
 fi
+
+uv --version >/dev/null 2>&1 || {
+  echo "uv was found but could not be executed successfully." >&2
+  exit 1
+}
 
 if ! command -v node >/dev/null 2>&1 && ! command -v nodejs >/dev/null 2>&1; then
   echo "Installing distro nodejs and npm"
