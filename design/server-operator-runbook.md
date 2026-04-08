@@ -92,6 +92,8 @@ This is the current stopping point before future `3plug bench create`, `3plug be
 3plug server update --execute
 ```
 
+Run the update first when you want the server to pick up the newest CLI behavior before continuing to the next operator step.
+
 ### Step 3: Verify Global Command Availability
 
 The install and update flows publish `3plug` and `3plug-pro` into `/usr/local/bin`, so no venv path export should be needed during normal use.
@@ -99,6 +101,23 @@ The install and update flows publish `3plug` and `3plug-pro` into `/usr/local/bi
 ```bash
 which 3plug
 which 3plug-pro
+```
+
+### Step 4: Continue To Server Dependencies
+
+After update, continue from the confirmed baseline into the next operator action:
+
+```bash
+3plug install server-dependencies
+3plug install server-dependencies --execute
+3plug server preflight
+```
+
+If you want the current production-oriented extras too:
+
+```bash
+3plug install server-dependencies --production-tools --execute
+3plug server preflight
 ```
 
 ## Existing Server Uninstall

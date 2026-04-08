@@ -264,6 +264,23 @@ This can be run from the `threeplug` operator shell after the CLI is installed. 
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
+Update first when you want the server to pick up the newest CLI behavior or the newest shell-backed install fixes before continuing to the next operator action.
+
+After update, the next confirmed operator target from the current server baseline is:
+
+```bash
+3plug install server-dependencies
+3plug install server-dependencies --execute
+3plug server preflight
+```
+
+If you also want the current production-oriented extras:
+
+```bash
+3plug install server-dependencies --production-tools --execute
+3plug server preflight
+```
+
 Use the update script when the server already has the `threeplug` operator user and workspace and you want to refresh the installed CLI directly:
 
 ```bash
@@ -371,12 +388,14 @@ Currently implemented:
 * `3plug server install-cli`
 * `3plug server update`
 * `3plug server uninstall`
+* `3plug install server-dependencies`
+* `3plug install bench`
 * local job recording for server actions
 * app and stack catalog inspection
 
 Next implementation phase:
 
-* make `3plug install server-dependencies` real on Ubuntu/Debian
-* make `3plug install bench` real
 * make `3plug bench create production` real
+* make `3plug bench register` real
+* make `3plug bench status` real
 * move bootstrap, update, and uninstall flows behind auditable `3plug` server actions and the future UI

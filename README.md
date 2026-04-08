@@ -204,7 +204,26 @@ This can be run from the `threeplug` operator shell after the CLI is installed. 
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
-### Step 3: Use The Direct Script Path If Needed
+Update first when you want the server to pick up the newest CLI command behavior or the newest shell-backed install fixes before continuing to the next operator step.
+
+### Step 3: Install Server Dependencies
+
+Once the server update is complete, continue from the confirmed baseline into the next operator action:
+
+```bash
+3plug install server-dependencies
+3plug install server-dependencies --execute
+3plug server preflight
+```
+
+If you also want the current production-oriented extras such as Nginx and Supervisor:
+
+```bash
+3plug install server-dependencies --production-tools --execute
+3plug server preflight
+```
+
+### Step 4: Use The Direct Script Path If Needed
 
 Use the update script directly if you prefer the shell-script path on a server that already has the `threeplug` operator user and workspace:
 
