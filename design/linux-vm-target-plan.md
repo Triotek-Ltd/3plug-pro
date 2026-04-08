@@ -25,11 +25,11 @@ The production-like install source is the Git URL:
 ```text
 python3 -m venv ~/.local/share/3plug-pro/venv
 ~/.local/share/3plug-pro/venv/bin/python -m pip install --upgrade pip
-~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli"
+~/.local/share/3plug-pro/venv/bin/python -m pip install "git+https://github.com/Triotek-Ltd/3plug-pro.git@v0.2.0#subdirectory=cli"
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
-Until the current foundation is committed and pushed, the Git URL will install the last pushed version on GitHub, not the current working tree.
+The scripted install and update flows now resolve the latest published GitHub release automatically. The explicit Git URL above is still useful when you want to pin a specific tag by hand.
 
 For a test branch, use:
 

@@ -110,11 +110,13 @@ If you are using the updated CLI surface already, you can inspect the same actio
 If you need a private fork or private mirror, pass a custom package URL into the script environment instead of bypassing the gate:
 
 ```bash
-sudo THREEPLUG_PACKAGE_URL="git+https://x-access-token:${GITHUB_TOKEN}@github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli" bash /tmp/install_3plug_cli.sh
+sudo THREEPLUG_PACKAGE_URL="git+https://x-access-token:${GITHUB_TOKEN}@github.com/Triotek-Ltd/3plug-pro.git@v0.2.0#subdirectory=cli" bash /tmp/install_3plug_cli.sh
 unset GITHUB_TOKEN
 ```
 
 This uses a venv so the install does not modify the system Python environment, refuses to continue until Git identity is configured, and publishes `3plug` and `3plug-pro` into `/usr/local/bin` so the commands are available globally.
+
+The default install and update flows now resolve the latest published GitHub release automatically. Override `THREEPLUG_PACKAGE_URL` only when you intentionally want a specific tag, a development branch, or a private mirror.
 
 ### Step 5: Run The First Checks
 
@@ -306,3 +308,5 @@ Start with:
 * `PUBLISHING.md`
 
 The first production-like target is an actual Linux server or local Linux VM. The next milestone is to run `3plug server preflight` there and use the results to implement the real server dependency and Bench install handlers.
+
+Releases are now automated from pushes to `main` and publish stable Git tags for server installs. See `PUBLISHING.md` for the publishing guidelines and release behavior.

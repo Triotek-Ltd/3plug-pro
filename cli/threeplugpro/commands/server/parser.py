@@ -75,8 +75,8 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     server_install_cli.add_argument("--user", default="threeplug", help="Operator user name.")
     server_install_cli.add_argument(
         "--package-url",
-        default="git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli",
-        help="Package URL used to install the 3plug CLI.",
+        default="latest",
+        help="Package URL used to install the 3plug CLI. Use 'latest' to resolve the newest published release.",
     )
     server_install_cli.set_defaults(handler=run_server_install_cli)
 
@@ -97,8 +97,8 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     )
     server_update.add_argument(
         "--package-url",
-        default="git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli",
-        help="Package URL used to update the installed 3plug CLI.",
+        default="latest",
+        help="Package URL used to update the installed 3plug CLI. Use 'latest' to resolve the newest published release.",
     )
     server_update.set_defaults(handler=run_server_update)
 
