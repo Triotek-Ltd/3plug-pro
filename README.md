@@ -99,7 +99,6 @@ Then install the current 3plug-pro CLI from GitHub through the gated install scr
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh
 sudo bash /tmp/install_3plug_cli.sh
-export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
 If you are using the updated CLI surface already, you can inspect the same action first with:
@@ -115,7 +114,7 @@ sudo THREEPLUG_PACKAGE_URL="git+https://x-access-token:${GITHUB_TOKEN}@github.co
 unset GITHUB_TOKEN
 ```
 
-This uses a venv so the install does not modify the system Python environment, and it refuses to continue until Git identity is configured.
+This uses a venv so the install does not modify the system Python environment, refuses to continue until Git identity is configured, and publishes `3plug` and `3plug-pro` into `/usr/local/bin` so the commands are available globally.
 
 ### Step 5: Run The First Checks
 
@@ -169,7 +168,7 @@ When you are ready to run the update on the server itself, use:
 3plug server update --execute
 ```
 
-This can be run from the `threeplug` operator shell after the CLI is installed and on `PATH`.
+This can be run from the `threeplug` operator shell after the CLI is installed. The install flow publishes `3plug` globally, so no venv path export should be needed during normal use.
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
@@ -214,7 +213,6 @@ Recommended safe sequence:
 exit
 sudo -i
 cd /opt/3plug-pro
-export PATH="/home/threeplug/.local/share/3plug-pro/venv/bin:$PATH"
 3plug server uninstall --remove-user --execute
 ```
 

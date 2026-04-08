@@ -44,7 +44,6 @@ Switch to the operator shell and run the first checks:
 ```bash
 su - threeplug
 cd /opt/3plug-pro
-export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 3plug --help
 3plug init
 3plug server preflight
@@ -65,12 +64,13 @@ export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 3plug server update --execute
 ```
 
-### Step 3: Fix PATH If Needed
+### Step 3: Verify Global Command Availability
 
-If the CLI is not on `PATH`, use:
+The install and update flows publish `3plug` and `3plug-pro` into `/usr/local/bin`, so no venv path export should be needed during normal use.
 
 ```bash
-export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
+which 3plug
+which 3plug-pro
 ```
 
 ## Existing Server Uninstall
@@ -91,7 +91,6 @@ Safe sequence:
 ```bash
 exit
 sudo -i
-export PATH="/home/threeplug/.local/share/3plug-pro/venv/bin:$PATH"
 3plug server uninstall --remove-user --execute
 ```
 

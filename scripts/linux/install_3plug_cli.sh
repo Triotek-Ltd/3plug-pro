@@ -5,6 +5,7 @@ THREEPLUG_USER="${THREEPLUG_USER:-threeplug}"
 THREEPLUG_HOME="${THREEPLUG_HOME:-/home/${THREEPLUG_USER}}"
 THREEPLUG_VENV="${THREEPLUG_VENV:-${THREEPLUG_HOME}/.local/share/3plug-pro/venv}"
 THREEPLUG_PACKAGE_URL="${THREEPLUG_PACKAGE_URL:-git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli}"
+THREEPLUG_GLOBAL_BIN_DIR="${THREEPLUG_GLOBAL_BIN_DIR:-/usr/local/bin}"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "Run this script as root or with sudo." >&2
@@ -38,6 +39,11 @@ sudo -H -u "${THREEPLUG_USER}" bash -lc "
   \"${THREEPLUG_VENV}/bin/python\" -m pip install --upgrade \"${THREEPLUG_PACKAGE_URL}\"
 "
 
+echo "Publishing global 3plug commands in ${THREEPLUG_GLOBAL_BIN_DIR}"
+install -d "${THREEPLUG_GLOBAL_BIN_DIR}"
+ln -sf "${THREEPLUG_VENV}/bin/3plug" "${THREEPLUG_GLOBAL_BIN_DIR}/3plug"
+ln -sf "${THREEPLUG_VENV}/bin/3plug-pro" "${THREEPLUG_GLOBAL_BIN_DIR}/3plug-pro"
+
 cat <<EOF
 
 Install complete.
@@ -46,7 +52,6 @@ Recommended verification as ${THREEPLUG_USER}:
 
   git config --global --get user.name
   git config --global --get user.email
-  export PATH="${THREEPLUG_VENV}/bin:\$PATH"
   3plug --help
   3plug init
   3plug server preflight

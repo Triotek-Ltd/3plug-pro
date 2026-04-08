@@ -81,7 +81,6 @@ Next commands:
   sudo bash /tmp/configure_3plug_git.sh
   curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/install_3plug_cli.sh -o /tmp/install_3plug_cli.sh
   sudo bash /tmp/install_3plug_cli.sh
-  export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
   3plug --help
   3plug init
   3plug server preflight

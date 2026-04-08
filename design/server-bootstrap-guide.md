@@ -137,6 +137,7 @@ What this does:
 * uses the `cli/` package inside this repository
 * avoids Ubuntu/Debian system Python restrictions for externally managed environments
 * refuses to continue until Git identity is configured for the operator user
+* publishes `3plug` and `3plug-pro` into `/usr/local/bin` so the commands are available globally
 
 If you need a private fork or private mirror, pass a custom package URL into the script environment instead of bypassing the gate:
 
@@ -145,15 +146,16 @@ sudo THREEPLUG_PACKAGE_URL="git+https://x-access-token:${GITHUB_TOKEN}@github.co
 unset GITHUB_TOKEN
 ```
 
-Ensure the 3plug-pro virtual environment bin path is active:
+Verify the global commands are available:
 
 ```bash
-export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
+which 3plug
+which 3plug-pro
 ```
 
 What this does:
 
-* makes the `3plug` command available in the current shell
+* confirms the global command links were created successfully
 
 Run the first 3plug checks:
 
@@ -256,7 +258,7 @@ When you are ready to run the update directly through the CLI, use:
 3plug server update --execute
 ```
 
-This can be run from the `threeplug` operator shell after the CLI is installed and available on `PATH`.
+This can be run from the `threeplug` operator shell after the CLI is installed. The install flow publishes `3plug` globally, so no venv path export should be needed during normal use.
 
 On pip-installed servers, `--execute` will fetch the current script to the server temp directory if the local repo script is not present under the workspace path.
 
@@ -299,7 +301,6 @@ Recommended safe sequence:
 exit
 sudo -i
 cd /opt/3plug-pro
-export PATH="/home/threeplug/.local/share/3plug-pro/venv/bin:$PATH"
 3plug server uninstall --remove-user --execute
 ```
 

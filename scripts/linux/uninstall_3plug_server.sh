@@ -5,6 +5,7 @@ THREEPLUG_USER="${THREEPLUG_USER:-threeplug}"
 THREEPLUG_WORKDIR="${THREEPLUG_WORKDIR:-/opt/3plug-pro}"
 THREEPLUG_HOME="${THREEPLUG_HOME:-/home/${THREEPLUG_USER}}"
 THREEPLUG_VENV="${THREEPLUG_VENV:-${THREEPLUG_HOME}/.local/share/3plug-pro/venv}"
+THREEPLUG_GLOBAL_BIN_DIR="${THREEPLUG_GLOBAL_BIN_DIR:-/usr/local/bin}"
 REMOVE_WORKDIR="${REMOVE_WORKDIR:-1}"
 REMOVE_VENV="${REMOVE_VENV:-1}"
 REMOVE_USER="${REMOVE_USER:-0}"
@@ -91,6 +92,19 @@ if [ "${REMOVE_VENV}" = "1" ] && [ -e "${THREEPLUG_VENV}" ]; then
   echo "Removing virtual environment: ${THREEPLUG_VENV}"
   rm -rf "${THREEPLUG_VENV}"
 fi
+
+for global_cmd in 3plug 3plug-pro; do
+  global_path="${THREEPLUG_GLOBAL_BIN_DIR}/${global_cmd}"
+  if [ -L "${global_path}" ] || [ -f "${global_path}" ]; then
+    resolved_path="$(readlink -f "${global_path}" 2>/dev/null || true)"
+    case "${resolved_path}" in
+      "${THREEPLUG_VENV}"/*)
+        echo "Removing global command link: ${global_path}"
+        rm -f "${global_path}"
+        ;;
+    esac
+  fi
+done
 
 if id "${THREEPLUG_USER}" >/dev/null 2>&1; then
   if [ "${REMOVE_USER}" = "1" ]; then
