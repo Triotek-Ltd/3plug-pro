@@ -109,7 +109,29 @@ The default Bench source now uses the SSH repo URL for the private `triotek-benc
 
 The Bench install script checks actual repo access for the `threeplug` user with `git ls-remote` before attempting the install.
 
-This is the current stopping point before future `3plug bench create`, `3plug bench register`, and `3plug bench status` work.
+### Step 6: Inspect Bench Creation
+
+```bash
+3plug bench create production
+```
+
+Use the printed `Fetch:` and `Run:` commands if you need the direct sudo script path for server execution.
+
+### Step 7: Verify The Created Bench
+
+```bash
+cd /opt/3plug-pro/benches/production
+bench version
+3plug bench list
+```
+
+Current scope of `3plug bench create production`:
+
+- creates the Bench runtime with `bench init`
+- records the bench in local 3plug state
+- does not yet set up MariaDB users/databases, Redis config, nginx config, or Supervisor programs
+
+This is the current stopping point before future `3plug bench register` and `3plug bench status` work.
 
 ## Existing Server Update
 

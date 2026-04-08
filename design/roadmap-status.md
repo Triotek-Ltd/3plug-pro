@@ -19,6 +19,7 @@ Current confirmed server checkpoint:
 * `3plug server preflight`
 * `3plug install server-dependencies`
 * `3plug install bench`
+* inspect `3plug bench create production`
 
 This checkpoint has been validated on a real Ubuntu host, including successful follow-up preflight results for:
 
@@ -74,7 +75,8 @@ Deliverable checklist:
 
 Remaining:
 
-* start `bench register`, `bench create`, and `bench status`
+* validate `bench create production` on a real Linux server
+* start `bench register` and `bench status`
 
 ## Phase 2: Local State and Job Store
 

@@ -200,7 +200,13 @@ The default Bench source now uses the SSH repo URL for the private `triotek-benc
 
 The Bench install script now checks actual repo access for the `threeplug` user with `git ls-remote` before attempting the install.
 
-This step is now implemented as a script-backed Bench install flow. The next major 3plug milestone after this is making `bench create`, `bench register`, and `bench status` real.
+After Bench install, the next step is to inspect and create the first managed bench runtime:
+
+```bash
+3plug bench create production
+```
+
+This step is now implemented as a script-backed Bench create flow. At the current stage it creates the Bench runtime with `bench init` and records it in local 3plug state, but it does not yet perform full MariaDB, Redis, nginx, or Supervisor production wiring.
 
 For existing servers, custom firewall handling, or manual equivalent commands, see `design/server-bootstrap-guide.md`.
 
@@ -376,9 +382,13 @@ Current server-confirmed operator path:
 
 This path has been validated on a real Ubuntu server through dependency installation, Bench installation (`bench --version` -> `5.0.0-dev`), and follow-up preflight checks, including `uv`, Node, Redis, MariaDB, wkhtmltopdf, Nginx, and Supervisor visibility.
 
-The next implementation phase will make these Bench lifecycle commands operational:
+The next server test path is:
 
 * `3plug bench create production`
+* `3plug bench list`
+
+Later implementation phases will make these Bench lifecycle commands operational:
+
 * `3plug bench register`
 * `3plug bench status`
 

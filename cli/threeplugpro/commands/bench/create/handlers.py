@@ -1,80 +1,16 @@
 from __future__ import annotations
 
 import argparse
-import os
 from pathlib import Path
-import subprocess
-import tempfile
 
-from threeplugpro.core import (
-    create_job,
-    list_bench_records,
-    output_json,
-    resolve_root,
-    update_job,
-    upsert_bench,
-)
-
-
-def _render_env_prefix(env_vars: dict[str, str]) -> str:
-    parts = []
-    for key, value in env_vars.items():
-        escaped = value.replace('"', '\\"')
-        parts.append(f'{key}="{escaped}"')
-    return " ".join(parts)
-
-
-def _render_script_command(script_path: Path, env_vars: dict[str, str]) -> str:
-    prefix = _render_env_prefix(env_vars)
-    if prefix:
-        return f"sudo env {prefix} bash {script_path}"
-    return f"sudo bash {script_path}"
-
-
-def _execute_script_with_fetch(script_path: Path, env_vars: dict[str, str], fetch_command: str) -> int:
-    if script_path.exists():
-        completed = subprocess.run(["bash", str(script_path)], check=False, env={**os.environ, **env_vars})
-        return completed.returncode
-
-    tmp_script = Path(tempfile.gettempdir()) / script_path.name
-    fetch_completed = subprocess.run(
-        [
-            "curl",
-            "-fsSL",
-            f"https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/{script_path.name}",
-            "-o",
-            str(tmp_script),
-        ],
-        check=False,
-        env=os.environ.copy(),
-    )
-    if fetch_completed.returncode != 0:
-        print(f"Failed to fetch script via: {fetch_command}")
-        return fetch_completed.returncode
-    completed = subprocess.run(["bash", str(tmp_script)], check=False, env={**os.environ, **env_vars})
-    return completed.returncode
-
-
-def _default_bench_path(root: Path, bench_name: str) -> Path:
-    return root / "benches" / bench_name
-
-
-def _approved_bench_root(root: Path) -> Path:
-    return root / "benches"
-
-
-def _path_is_within(path: Path, parent: Path) -> bool:
-    try:
-        path.resolve().relative_to(parent.resolve())
-        return True
-    except ValueError:
-        return False
+from threeplugpro.commands.bench.common import approved_bench_root, default_bench_path, execute_script_with_fetch, path_is_within, render_script_command
+from threeplugpro.core import create_job, output_json, resolve_root, update_job, upsert_bench
 
 
 def run_bench_create(args: argparse.Namespace) -> int:
     root = resolve_root(args)
-    bench_path = Path(args.path).resolve() if args.path else _default_bench_path(root, args.name).resolve()
-    bench_root = _approved_bench_root(root).resolve()
+    bench_path = Path(args.path).resolve() if args.path else default_bench_path(root, args.name).resolve()
+    bench_root = approved_bench_root(root).resolve()
 
     payload = {
         "implemented": True,
@@ -92,7 +28,7 @@ def run_bench_create(args: argparse.Namespace) -> int:
         "no_backups": args.no_backups,
         "dev": args.dev,
         "execute": args.execute,
-        "path_is_within_approved_root": _path_is_within(bench_path, bench_root),
+        "path_is_within_approved_root": path_is_within(bench_path, bench_root),
     }
 
     env_vars = {
@@ -111,7 +47,7 @@ def run_bench_create(args: argparse.Namespace) -> int:
         env_vars["THREEPLUG_BENCH_PYTHON"] = args.python_executable
 
     script_path = root / "scripts" / "linux" / "create_bench.sh"
-    command = _render_script_command(script_path, env_vars)
+    command = render_script_command(script_path, env_vars)
     payload.update(
         {
             "script_path": script_path,
@@ -152,7 +88,7 @@ def run_bench_create(args: argparse.Namespace) -> int:
     if args.execute:
         print("Executing bench create script.")
         update_job(root, args, job_id=job_id, status="running", details=payload)
-        code = _execute_script_with_fetch(script_path, env_vars, str(payload["fetch_command"]))
+        code = execute_script_with_fetch(script_path, env_vars, str(payload["fetch_command"]))
         if code == 0:
             upsert_bench(
                 root,
@@ -170,21 +106,4 @@ def run_bench_create(args: argparse.Namespace) -> int:
     return 0
 
 
-def run_bench_list(args: argparse.Namespace) -> int:
-    root = resolve_root(args)
-    benches = list_bench_records(root, args)
-    payload = {
-        "implemented": True,
-        "benches": benches,
-        "future_local_bench_root": _approved_bench_root(root),
-    }
-    if output_json(args, payload):
-        return 0
-    if not benches:
-        print("No managed benches are recorded yet.")
-        print(f"Expected bench root: {_approved_bench_root(root)}")
-        return 0
-    print("Managed benches")
-    for bench in benches:
-        print(f"- {bench['name']} {bench['status']} {bench['path']}")
-    return 0
+__all__ = ["run_bench_create"]
