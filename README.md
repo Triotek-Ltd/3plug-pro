@@ -116,7 +116,7 @@ unset GITHUB_TOKEN
 
 This uses a venv so the install does not modify the system Python environment, refuses to continue until Git identity is configured, and publishes `3plug` and `3plug-pro` into `/usr/local/bin` so the commands are available globally.
 
-The default install and update flows now resolve the latest published GitHub release automatically. Override `THREEPLUG_PACKAGE_URL` only when you intentionally want a specific tag, a development branch, or a private mirror.
+Until regular stable releases are in use, the default install and update flows use the current pre-release source on `main`. Override `THREEPLUG_PACKAGE_URL` only when you intentionally want a specific tag, a different branch, or a private mirror.
 
 ### Step 5: Run The First Checks
 

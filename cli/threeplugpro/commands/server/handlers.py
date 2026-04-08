@@ -231,7 +231,7 @@ def run_server_install_cli(args: argparse.Namespace) -> int:
             "run_command": command.replace(str(root / "scripts" / "linux" / "install_3plug_cli.sh"), "/tmp/install_3plug_cli.sh"),
             "local_execute_command": command,
             "requires_git_identity": True,
-            "resolves_latest_release": args.package_url == "latest",
+            "uses_prerelease_source": args.package_url.endswith("@main#subdirectory=cli"),
         },
     )
     job_id = _record_server_job(
@@ -289,7 +289,7 @@ def run_server_update(args: argparse.Namespace) -> int:
             "local_execute_command": command,
             "preserves_workspace_state": True,
             "requires_git_identity": True,
-            "resolves_latest_release": args.package_url == "latest",
+            "uses_prerelease_source": args.package_url.endswith("@main#subdirectory=cli"),
         },
     )
     job_id = _record_server_job(

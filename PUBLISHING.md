@@ -112,7 +112,7 @@ When code is pushed to `main`, the release workflow:
 
 ## Stable Install Sources
 
-For stable server installs or updates, prefer the default latest-release resolver in the scripts, or pin an explicit tag when you need a known target:
+For stable server installs or updates later, prefer explicit release tags. Until regular releases are actually being published, the scripts default to the current pre-release source on `main`.
 
 ```text
 git+https://github.com/Triotek-Ltd/3plug-pro.git@v0.2.1#subdirectory=cli
@@ -132,7 +132,7 @@ curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/
 sudo THREEPLUG_PACKAGE_URL="git+https://github.com/Triotek-Ltd/3plug-pro.git@v0.2.1#subdirectory=cli" bash /tmp/update_3plug_server.sh
 ```
 
-For a first install from a stable release, use the same tag-based package URL with `install_3plug_cli.sh`. If you do not provide `THREEPLUG_PACKAGE_URL`, the scripts now resolve the latest published release automatically.
+For a first install from a stable release later, use the same tag-based package URL with `install_3plug_cli.sh`. For now, if you do not provide `THREEPLUG_PACKAGE_URL`, the scripts default to `main` as the current pre-release source.
 
 ## Maintainer Notes
 

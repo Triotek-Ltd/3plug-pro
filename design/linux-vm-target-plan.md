@@ -29,7 +29,7 @@ python3 -m venv ~/.local/share/3plug-pro/venv
 export PATH="$HOME/.local/share/3plug-pro/venv/bin:$PATH"
 ```
 
-The scripted install and update flows now resolve the latest published GitHub release automatically. The explicit Git URL above is still useful when you want to pin a specific tag by hand.
+Until regular stable releases are in use, the scripted install and update flows default to the current pre-release source on `main`. The explicit Git URL above is still useful when you want to pin a specific tag by hand.
 
 For a test branch, use:
 

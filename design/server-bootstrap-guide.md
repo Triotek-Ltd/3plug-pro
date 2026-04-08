@@ -133,7 +133,7 @@ If the updated CLI command surface is already available, you can inspect the sam
 What this does:
 
 * creates a dedicated virtual environment for the 3plug-pro CLI
-* resolves and installs the latest published 3plug-pro CLI release by default
+* installs the current pre-release 3plug-pro CLI source from `main` by default
 * uses the `cli/` package inside this repository
 * avoids Ubuntu/Debian system Python restrictions for externally managed environments
 * refuses to continue until Git identity is configured for the operator user
@@ -146,7 +146,7 @@ sudo THREEPLUG_PACKAGE_URL="git+https://x-access-token:${GITHUB_TOKEN}@github.co
 unset GITHUB_TOKEN
 ```
 
-The default install and update flows now resolve the latest published GitHub release automatically. Use a different package URL only when you intentionally want a specific older tag, a newer development branch, or a private mirror.
+Until regular stable releases are in use, the default install and update flows use the current pre-release source on `main`. Use a different package URL only when you intentionally want a specific tag, a different branch, or a private mirror.
 
 Verify the global commands are available:
 

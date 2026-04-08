@@ -4,14 +4,8 @@ set -euo pipefail
 THREEPLUG_USER="${THREEPLUG_USER:-threeplug}"
 THREEPLUG_HOME="${THREEPLUG_HOME:-/home/${THREEPLUG_USER}}"
 THREEPLUG_VENV="${THREEPLUG_VENV:-${THREEPLUG_HOME}/.local/share/3plug-pro/venv}"
-THREEPLUG_PACKAGE_URL="${THREEPLUG_PACKAGE_URL:-latest}"
+THREEPLUG_PACKAGE_URL="${THREEPLUG_PACKAGE_URL:-git+https://github.com/Triotek-Ltd/3plug-pro.git@main#subdirectory=cli}"
 THREEPLUG_GLOBAL_BIN_DIR="${THREEPLUG_GLOBAL_BIN_DIR:-/usr/local/bin}"
-
-resolve_latest_package_url() {
-  local latest_tag
-  latest_tag="$(curl -fsSL https://api.github.com/repos/Triotek-Ltd/3plug-pro/releases/latest | python3 -c 'import json,sys; print(json.load(sys.stdin)["tag_name"])')"
-  printf 'git+https://github.com/Triotek-Ltd/3plug-pro.git@%s#subdirectory=cli' "${latest_tag}"
-}
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "Run this script as root or with sudo." >&2
@@ -34,11 +28,6 @@ if [ -z "${GIT_USER_NAME}" ] || [ -z "${GIT_USER_EMAIL}" ]; then
   echo "  curl -fsSL https://raw.githubusercontent.com/Triotek-Ltd/3plug-pro/main/scripts/linux/configure_3plug_git.sh -o /tmp/configure_3plug_git.sh" >&2
   echo "  sudo bash /tmp/configure_3plug_git.sh" >&2
   exit 1
-fi
-
-if [ "${THREEPLUG_PACKAGE_URL}" = "latest" ]; then
-  echo "Resolving latest published 3plug release"
-  THREEPLUG_PACKAGE_URL="$(resolve_latest_package_url)"
 fi
 
 echo "Installing 3plug CLI for ${THREEPLUG_USER}"
