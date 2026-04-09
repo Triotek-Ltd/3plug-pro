@@ -392,5 +392,7 @@ def run_command(args: Iterable[str]) -> tuple[int, str]:
         )
     except FileNotFoundError:
         return 127, ""
+    except OSError as exc:
+        return 126, str(exc)
     output = (completed.stdout or completed.stderr).strip()
     return completed.returncode, output.splitlines()[0] if output else ""

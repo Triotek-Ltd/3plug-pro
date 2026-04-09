@@ -329,6 +329,17 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(output, "Python 3.12.3")
         self.assertEqual(used_command, ["python3", "--version"])
 
+    def test_run_command_returns_warn_for_exec_format_errors(self) -> None:
+        with mock.patch("subprocess.run", side_effect=OSError(8, "Exec format error")), mock.patch(
+            "shutil.which", return_value="/usr/local/bin/python3.14"
+        ):
+            from threeplugpro.core import run_command
+
+            code, output = run_command(["python3.14", "--version"])
+
+        self.assertEqual(code, 126)
+        self.assertIn("Exec format error", output)
+
 
 if __name__ == "__main__":
     unittest.main()
