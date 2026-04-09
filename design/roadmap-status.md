@@ -32,6 +32,11 @@ This checkpoint has been validated on a real Ubuntu host, including successful f
 * supervisord
 * Bench install (`bench --version` -> `5.0.0-dev`)
 
+Open issue discovered during real server validation:
+
+* `bench create production` failed against the current Triotek Frappe v16 source because the stack now requires Python 3.14 while the server had only Python 3.12 visible to Bench creation.
+* 3plug is now being aligned so preflight, dependency install, and Bench create all target Python 3.14 explicitly.
+
 ## Phase 0: Repo Cleanup and Build Foundation
 
 Status: complete except commit decision

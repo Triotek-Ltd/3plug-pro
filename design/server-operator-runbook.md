@@ -131,6 +131,11 @@ Current scope of `3plug bench create production`:
 - records the bench in local 3plug state
 - does not yet set up MariaDB users/databases, Redis config, nginx config, or Supervisor programs
 
+Current runtime requirement:
+
+- the Triotek Frappe v16 path now expects Python 3.14
+- rerun the dependency install step if `/usr/local/bin/python3.14` is not present yet
+
 This is the current stopping point before future `3plug bench register` and `3plug bench status` work.
 
 ## Existing Server Update

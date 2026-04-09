@@ -174,8 +174,9 @@ class CliSmokeTests(unittest.TestCase):
         self.assertEqual(payload["action"], "server-dependencies")
         self.assertTrue(payload["script_exists"])
         self.assertTrue(payload["requires_explicit_execution"])
+        self.assertEqual(payload["target_runtime_python"], "3.14")
         self.assertIn("wkhtmltopdf", payload["installs"])
-        self.assertIn("python3-venv", payload["installs"])
+        self.assertIn("uv-managed python3.14", payload["installs"])
         self.assertIn("apache2", payload["production_conflicts_checked"])
 
     def test_json_install_server_dependencies_with_production_tools_smoke(self) -> None:
@@ -213,6 +214,8 @@ class CliSmokeTests(unittest.TestCase):
         self.assertTrue(payload["script_exists"])
         self.assertTrue(payload["path_is_within_approved_root"])
         self.assertTrue(payload["requires_bench_install"])
+        self.assertEqual(payload["python_executable"], "/usr/local/bin/python3.14")
+        self.assertEqual(payload["frappe_path"], "git@github.com:Triotek-Ltd/triotek-frappe.git")
 
     def test_bench_list_reads_recorded_benches(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

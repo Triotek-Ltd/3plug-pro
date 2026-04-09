@@ -10,6 +10,7 @@ def run_install_server_dependencies(args: argparse.Namespace) -> int:
     root = resolve_root(args)
     env_vars = {
         "THREEPLUG_TARGET_STACK": "frappe-v16",
+        "THREEPLUG_TARGET_PYTHON_VERSION": "3.14",
         "THREEPLUG_INSTALL_PRODUCTION_TOOLS": "1" if args.production_tools else "0",
     }
     script_path = root / "scripts" / "linux" / "install_server_dependencies.sh"
@@ -27,6 +28,7 @@ def run_install_server_dependencies(args: argparse.Namespace) -> int:
         "local_execute_command": command,
         "requires_explicit_execution": True,
         "target_stack": "frappe-v16",
+        "target_runtime_python": "3.14",
         "production_conflicts_checked": ["apache2"],
         "installs": [
             "build-essential",
@@ -38,6 +40,7 @@ def run_install_server_dependencies(args: argparse.Namespace) -> int:
             "python3-dev",
             "python3-pip",
             "python3-venv",
+            "uv-managed python3.14",
             "xvfb",
             "libfontconfig1",
             "cron",

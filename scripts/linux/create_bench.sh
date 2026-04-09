@@ -6,9 +6,9 @@ THREEPLUG_WORKDIR="${THREEPLUG_WORKDIR:-/opt/3plug-pro}"
 THREEPLUG_BENCH_NAME="${THREEPLUG_BENCH_NAME:-production}"
 THREEPLUG_BENCH_PATH="${THREEPLUG_BENCH_PATH:-${THREEPLUG_WORKDIR}/benches/${THREEPLUG_BENCH_NAME}}"
 THREEPLUG_BENCH_ROOT="${THREEPLUG_BENCH_ROOT:-${THREEPLUG_WORKDIR}/benches}"
-THREEPLUG_FRAPPE_PATH="${THREEPLUG_FRAPPE_PATH:-https://github.com/Triotek-Ltd/triotek-frappe.git}"
+THREEPLUG_FRAPPE_PATH="${THREEPLUG_FRAPPE_PATH:-git@github.com:Triotek-Ltd/triotek-frappe.git}"
 THREEPLUG_FRAPPE_BRANCH="${THREEPLUG_FRAPPE_BRANCH:-main}"
-THREEPLUG_BENCH_PYTHON="${THREEPLUG_BENCH_PYTHON:-}"
+THREEPLUG_BENCH_PYTHON="${THREEPLUG_BENCH_PYTHON:-/usr/local/bin/python3.14}"
 THREEPLUG_BENCH_SKIP_ASSETS="${THREEPLUG_BENCH_SKIP_ASSETS:-0}"
 THREEPLUG_BENCH_NO_BACKUPS="${THREEPLUG_BENCH_NO_BACKUPS:-0}"
 THREEPLUG_BENCH_DEV="${THREEPLUG_BENCH_DEV:-0}"
@@ -27,6 +27,12 @@ fi
 if ! command -v bench >/dev/null 2>&1; then
   echo "Bench is not installed or not on PATH." >&2
   echo "Run the Bench install step first." >&2
+  exit 1
+fi
+
+if [ ! -x "${THREEPLUG_BENCH_PYTHON}" ]; then
+  echo "Required bench Python is not available: ${THREEPLUG_BENCH_PYTHON}" >&2
+  echo "Run the dependency install step again so Python 3.14 is installed through uv." >&2
   exit 1
 fi
 
@@ -58,10 +64,7 @@ sudo -H -u "${THREEPLUG_USER}" env \
   BENCH_DEV="${THREEPLUG_BENCH_DEV}" \
   bash -lc '
     set -euo pipefail
-    cmd=(bench init "$BENCH_PATH" --frappe-path "$FRAPPE_PATH" --frappe-branch "$FRAPPE_BRANCH")
-    if [ -n "${BENCH_PYTHON}" ]; then
-      cmd+=(--python "$BENCH_PYTHON")
-    fi
+    cmd=(bench init "$BENCH_PATH" --frappe-path "$FRAPPE_PATH" --frappe-branch "$FRAPPE_BRANCH" --python "$BENCH_PYTHON")
     if [ "${BENCH_SKIP_ASSETS}" = "1" ]; then
       cmd+=(--skip-assets)
     fi

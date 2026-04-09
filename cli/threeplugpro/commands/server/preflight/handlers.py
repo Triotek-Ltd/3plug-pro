@@ -21,6 +21,7 @@ def run_server_preflight(args: argparse.Namespace) -> int:
         ("os", [["cmd", "/c", "ver"]] if platform.system() == "Windows" else [["uname", "-a"]]),
         ("git", [["git", "--version"]]),
         ("python", [["python", "--version"], ["python3", "--version"]]),
+        ("python_target", [["python3.14", "--version"]]),
         ("uv", [["uv", "--version"]]),
         ("pip", [["pip", "--version"], ["pip3", "--version"]]),
         ("node", [["node", "--version"], ["nodejs", "--version"]]),
@@ -39,6 +40,7 @@ def run_server_preflight(args: argparse.Namespace) -> int:
         "command_family": "server",
         "action": "preflight",
         "target_stack": "frappe-v16",
+        "target_runtime_python": "3.14",
         "checks": [],
     }
     job_id = record_server_job(

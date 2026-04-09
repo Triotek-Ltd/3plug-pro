@@ -11,7 +11,7 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
     bench_create.add_argument("--path", help="Bench path. Defaults to <root>/benches/<name>.")
     bench_create.add_argument(
         "--frappe-path",
-        default="https://github.com/Triotek-Ltd/triotek-frappe.git",
+        default="git@github.com:Triotek-Ltd/triotek-frappe.git",
         help="Frappe source used during bench init.",
     )
     bench_create.add_argument(
@@ -19,7 +19,12 @@ def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) ->
         default="main",
         help="Frappe branch used during bench init.",
     )
-    bench_create.add_argument("--python", dest="python_executable", help="Python executable to pass to bench init.")
+    bench_create.add_argument(
+        "--python",
+        dest="python_executable",
+        default="/usr/local/bin/python3.14",
+        help="Python executable to pass to bench init. Defaults to the uv-managed Python 3.14 runtime.",
+    )
     bench_create.add_argument("--skip-assets", action="store_true", help="Pass --skip-assets to bench init.")
     bench_create.add_argument("--no-backups", action="store_true", help="Pass --no-backups to bench init.")
     bench_create.add_argument("--dev", action="store_true", help="Pass --dev to bench init.")

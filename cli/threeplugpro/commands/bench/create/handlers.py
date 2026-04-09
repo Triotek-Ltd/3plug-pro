@@ -24,6 +24,7 @@ def run_bench_create(args: argparse.Namespace) -> int:
         "frappe_path": args.frappe_path,
         "frappe_branch": args.frappe_branch,
         "python_executable": args.python_executable,
+        "target_runtime_python": "3.14",
         "skip_assets": args.skip_assets,
         "no_backups": args.no_backups,
         "dev": args.dev,
@@ -58,6 +59,7 @@ def run_bench_create(args: argparse.Namespace) -> int:
             "local_execute_command": command,
             "requires_bench_install": True,
             "requires_git_identity": True,
+            "requires_repo_ssh": args.frappe_path.startswith("git@github.com:") or args.frappe_path.startswith("ssh://git@github.com/"),
         }
     )
 

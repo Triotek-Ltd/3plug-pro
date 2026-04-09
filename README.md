@@ -387,6 +387,14 @@ The next server test path is:
 * `3plug bench create production`
 * `3plug bench list`
 
+Important runtime note for the current Triotek Frappe v16 stack:
+
+* Bench creation now expects Python 3.14 specifically.
+* `3plug install server-dependencies` installs Python 3.14 through `uv` and links it as `/usr/local/bin/python3.14`.
+* `3plug bench create production` now defaults to:
+  * SSH Frappe source: `git@github.com:Triotek-Ltd/triotek-frappe.git`
+  * Python executable: `/usr/local/bin/python3.14`
+
 Later implementation phases will make these Bench lifecycle commands operational:
 
 * `3plug bench register`

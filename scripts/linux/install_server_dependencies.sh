@@ -4,6 +4,7 @@ set -euo pipefail
 THREEPLUG_TARGET_STACK="${THREEPLUG_TARGET_STACK:-frappe-v16}"
 THREEPLUG_INSTALL_PRODUCTION_TOOLS="${THREEPLUG_INSTALL_PRODUCTION_TOOLS:-0}"
 THREEPLUG_GLOBAL_BIN_DIR="${THREEPLUG_GLOBAL_BIN_DIR:-/usr/local/bin}"
+THREEPLUG_TARGET_PYTHON_VERSION="${THREEPLUG_TARGET_PYTHON_VERSION:-3.14}"
 
 publish_global_binary() {
   local source_path="$1"
@@ -153,6 +154,16 @@ uv --version >/dev/null 2>&1 || {
   exit 1
 }
 
+echo "Installing managed Python ${THREEPLUG_TARGET_PYTHON_VERSION} with uv"
+uv python install "${THREEPLUG_TARGET_PYTHON_VERSION}"
+target_python_path="$(uv python find "${THREEPLUG_TARGET_PYTHON_VERSION}")"
+if [ -z "${target_python_path}" ] || [ ! -x "${target_python_path}" ]; then
+  echo "uv did not provide a usable Python ${THREEPLUG_TARGET_PYTHON_VERSION} interpreter." >&2
+  exit 1
+fi
+
+publish_global_binary "${target_python_path}" "python${THREEPLUG_TARGET_PYTHON_VERSION}"
+
 if ! command -v node >/dev/null 2>&1 && ! command -v nodejs >/dev/null 2>&1; then
   echo "Installing distro nodejs and npm"
   DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs npm
@@ -174,6 +185,7 @@ Recommended verification:
 Notes:
 
   - This script installs the current 3plug dependency foundation for Ubuntu/Debian.
+  - Python ${THREEPLUG_TARGET_PYTHON_VERSION} is installed through uv and linked as python${THREEPLUG_TARGET_PYTHON_VERSION}.
   - When production tools are requested, apache2 is stopped and disabled before nginx is enabled.
   - wkhtmltopdf is installed from the distro package here; verify the exact version and patched-Qt status from preflight.
   - Verify exact versions from preflight before creating a Bench runtime.
