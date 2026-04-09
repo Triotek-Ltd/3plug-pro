@@ -1,5 +1,11 @@
 # 3plug-pro Roadmap Status
 
+## Legacy implementation note
+
+This repo is now the coordination and bootstrap root, not the long-term implementation home of the actual control plane.
+
+The real product direction is to use Press as the base and adapt it into Triotek's 3plug product under `3plug-control`.
+
 ## Current position
 
 We are following `roadmap.md`.

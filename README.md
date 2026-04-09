@@ -1,5 +1,17 @@
 # 3plug-pro
 
+Legacy note:
+
+This repo remains the coordination, planning, bootstrap, and migration root.
+
+It should no longer be treated as the main implementation home for the real 3plug control plane.
+
+The real product direction is now:
+
+* use Press as the base
+* adapt it into Triotek's 3plug product
+* move actual control-plane implementation into `3plug-control`
+
 3plug-pro is Triotek's managed operations layer for Frappe and ERPNext environments.
 
 It is designed to give teams a safer, governed way to operate multiple Frappe sites through Bench while keeping source control, app selection, lifecycle actions, and auditability under Triotek control.
